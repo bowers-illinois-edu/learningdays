@@ -1,0 +1,3 @@
+[submodule "BIB"]
+	path = BIB
+	url = git@github.com:bowers-illinois-edu/Research-Group-Bibliography.git

@@ -1,0 +1,187 @@
+
+%\documentclass[11pt,ignorenonframetext,xcolor={svgnames}]{beamer}
+%\setbeameroption{hide notes}
+\usepackage{etex}
+\reserveinserts{28}
+\usepackage{presentation}
+\usepackage{../Styles/notation}
+\usepackage{caption}
+\usepackage{amssymb,amsmath}
+\usepackage{tikz}
+\usepackage{textpos}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+%\usepackage{lmodern}
+\usepackage{unicode-math} % for math fonts
+\usepackage{fontspec,xltxtra,xunicode}
+\defaultfontfeatures{Mapping=tex-text,Scale=MatchLowercase}
+\setmainfont{Lato}
+\setmonofont[Scale=MatchLowercase]{Source Code Pro Light}
+%\setmathfont{Cambria Math}
+\let\sfdefault\rmdefault
+\newcommand{\euro}{€}
+\captionsetup{labelformat=empty,labelsep=none,font=small,skip=.25ex} %No "Figure" labels
+\usecolortheme{default}
+\useinnertheme{default}
+\usefonttheme{default}
+%\useoutertheme{progressbar}
+\usepackage{beamerouterthemeprogressbar}
+\progressbaroptions{titlepage=normal,headline=normal,frametitle=normal}
+
+
+% Define SBST Colors
+%% Dark Yellow: 102, 83, 30
+%% Dark Orange: 104, 55, 34
+%% Dark Red: 107, 36, 31
+%% Dark Blue: 19, 64, 80
+%% Dark Green: 0, 86, 79
+%% yellow:  R=242 G=196 B=70 F2C446
+%% orange:  R=249 G=131 B=74 F9834A
+%% blue:  R=46 G=154 B=196   2E9AC4
+%% red:  R=250 G=86 B=70 FA5646
+%% green:  R=3 G=202 B=185 03CAB9
+%% grey:  R=153 G=153 B=153 999999
+%% Dark Yellow: 102, 83, 30
+
+\definecolor{darkyellow}{rgb}{102,83,30}
+\definecolor{darkorange}{rgb}{.41,.22,.13}
+\definecolor{orange}{HTML}{F9834A}
+\definecolor{yellow}{HTML}{F2C446}
+\definecolor{blue}{HTML}{2E9AC4}
+%\definecolor{darkblue}{rgb}{19,64,80}
+\definecolor{darkblue}{HTML}{134050}
+\definecolor{green}{HTML}{03CAB9}
+\definecolor{grey}{HTML}{999999}
+\definecolor{darkgrey}{HTML}{4d4d4d}
+%\definecolor{progressbar@bgblue}{rgb}{0.92, 0.93, 0.95}
+
+%\setbeamerfont*{frametitle}{size=\small,series=\bfseries,bg=white,fg=black}
+%\setbeamerfont*{frametitle}{size=\small,series=\bfseries,bg=white,fg=progressbar@bgblue!90!progressbar@fgblue}
+\setbeamerfont*{note page}{size=\scriptsize}%%footnotesize}
+\setbeamertemplate{note page}[compress]
+\setbeamercovered{transparent}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{items}[circle]
+%\setbeamertemplate{sections/subsections in toc}%[circle]
+\setbeamersize{description width=2ex}
+% \setbeamersize{text margin left=1ex,text margin right=1ex}
+\setbeamersize{text margin left=2ex,text margin right=1ex}
+%%\setbeamersize{ParSkip 1ex plus 1pt minus 1pt}
+%% %% %% \setbeamertemplate{caption}[numbered]
+\setbeamertemplate{caption label separator}{:}
+\setbeamercolor{title}{fg=blue} %was green
+\setbeamercolor{author}{fg=orange}
+\setbeamercolor{institute}{fg=darkgrey}
+\setbeamercolor{date}{fg=darkgrey}
+\setbeamerfont{author}{shape=\itshape}
+\setbeamerfont{institute}{shape=\itshape}
+\setbeamercolor{frametitle}{fg=blue}
+\setbeamercolor{structure}{fg=blue}
+\setbeamercolor{description item}{fg=orange,bg=darkgrey}
+\setbeamercolor{caption name}{fg=normal text.fg}
+
+\setbeamerfont*{description item}{series=\bfseries}
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{\usepackage{microtype}}{}
+\setbeamerfont{quote}{shape=\upshape}
+
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\setcounter{secnumdepth}{0}
+
+\usepackage{natbib}
+%\bibliographystyle{plainnat}
+%\bibliography{$biblio-files$}
+\usepackage{fancyvrb}
+\usepackage{longtable,booktabs}
+\usepackage{caption}
+% These lines are needed to make table captions work with longtable:
+\makeatletter
+\def\fnum@table{\tablename~\thetable}
+\makeatother
+\usepackage{url}
+%% from http://www.kronto.org/thesis/tips/url-formatting.html
+\makeatletter
+\def\url@leostyle{%
+  \@ifundefined{selectfont}{\def\UrlFont{\sf}}{\def\UrlFont{\sffamily}}}
+\makeatother
+\urlstyle{sf}
+
+\usepackage{graphicx}
+%% \makeatletter
+%% \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+%% \def\maxheight{\ifdim\Gin@nat@height>\textheight0.8\textheight\else\Gin@nat@height\fi}
+%% \makeatother
+%% % Scale images if necessary, so that they will not overflow the page
+%% % margins by default, and it is still possible to overwrite the defaults
+%% % using explicit options in \includegraphics[width, height, ...]{}
+%% \setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+
+\usepackage[export]{adjustbox}
+
+% Comment these out if you don't want a slide with just the
+% part/section/subsection/subsubsection title:
+ \AtBeginPart{
+   \let\insertpartnumber\relax
+     \let\partname\relax
+     \frame{\partpage}
+ }
+
+\AtBeginSection{%
+  \let\insertsectionnumber\relax
+  \let\sectionname\relax
+  {%
+    \setbeamercolor{background canvas}{bg=grey}
+    \setbeamercolor{frametitle}{fg=white,bg=darkblue}
+    \setbeamercolor{normal text}{bg=white,fg=darkblue}
+    \setbeamercolor{structure}{fg=white,bg=darkblue}
+    \setbeamertemplate{section in toc shaded}[default][10]
+    %\setbeamercolor{section in toc shaded}{use=structure,fg=structure.fg}
+    \setbeamercolor{section in toc}{fg=darkblue}
+    %\setbeamercolor{subsection in toc shaded}{fg=black}
+    %\setbeamercolor{subsection in toc}{fg=darkblue}
+    %\setbeamertemplate{subsections in toc}[circle]
+    \begin{frame}
+      %\tableofcontents[currentsection,hideothersubsections,sectionstyle=shaded]
+      \tableofcontents[currentsection]
+    \end{frame}
+  }
+}
+
+%%% \AtBeginSubsection{
+%%%   \let\insertsubsectionnumber\relax
+%%%     \let\subsectionname\relax
+%%%     \frame{\subsectionpage}
+%%% }
+%%%
+%%% $if(strikeout)$
+\usepackage[normalem]{ulem}
+% avoid problems with \sout in headers with hyperref:
+\pdfstringdefDisableCommands{\renewcommand{\sout}{}}
+%%% $endif$
+
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+
+\setcounter{secnumdepth}{0}
+
+\VerbatimFootnotes% allows verbatim text in footnotes
+
+%% $if(lang)$
+\usepackage[english]{babel}
+%% $endif$
+
+%\graphicspath{{.}{../figures/}} % make it easier to find the logos
+
+\renewcommand{\bibsection}{\subsection*{References}}
+
+%% \addtobeamertemplate{frametitle}{}{%
+%% \begin{tikzpicture}[remember picture,overlay]
+%% \node[anchor=south east,yshift=6pt,xshift=-3pt] at (current page.south east) {\includegraphics[height=0.5cm]{SBSTLightBulb}};
+%% \end{tikzpicture}}
+%%
+%% \addtobeamertemplate{title page}{}{%
+%% \begin{tikzpicture}[remember picture,overlay]
+%% \node[anchor=south east,yshift=5pt] at (current page.south east) {\includegraphics[height=2cm]{SBSTLogo}};
+%% \end{tikzpicture}}
+

@@ -1,0 +1,337 @@
+%\documentclass[10pt,ignorenonframetext,xcolor={svgnames}]{beamer}
+\documentclass[10pt,ignorenonframetext]{beamer}
+
+\graphicspath{{.}{/Users/jwbowers/Dropbox/GhanaModelsDropbox/Figures2016/}{/Users/jwbowers/Dropbox/FisherSUTVADropbox/figures/}}
+
+
+<<include=FALSE,cache=FALSE>>=
+opts_chunk$set(tidy=FALSE,echo=FALSE,results='markup',fig.path='figs/fig',cache=FALSE,highlight=TRUE,width.cutoff=132,size='footnotesize',out.width='1.2\\textwidth',message=FALSE,comment=NA)
+@
+
+\usepackage{bowers-beamer}
+
+\newcommand{\framen}[1]{\frame{#1 \note{ }}}
+
+\title[Reasoning about Inference]{A Reasoned Basis for Inference:\\Fun with Fisher}
+
+\author[Bowers]{
+  Jake Bowers\inst{1}$,$\inst{2} 
+}
+
+\date[15 October 2015]{Aronow and Crawford Seminar, Yale University}
+
+\institute[Illinois]{
+  \inst{1}
+  Political Science \& Statistics \& NCSA @ University of Illinois
+
+  \smallskip
+
+  \inst{2}
+  White House Social and Behavioral Sciences Team
+
+  \smallskip
+
+  {jwbowers@illinois.edu   --- \href{http://jakebowers.org}{http://jakebowers.org} }
+}
+
+\renewcommand{\bibsection}{\subsection*{References}}
+
+
+\begin{document}
+
+\begin{frame}[plain,label=intro,noframenumbering]
+  \titlepage
+\end{frame}
+
+\section{Overview Statistical Inference for Causal Quantities}
+
+\begin{frame}
+  \frametitle{What is the true effect of the treatment assignment?}
+
+  \only<1>{
+    \includegraphics[width=.8\textwidth]{cartoonNeymanBayesFisherCropped.pdf} }
+  \only<2>{ \includegraphics[width=.8\textwidth]{cartoon3ATENeyman.pdf} }
+  \only<3>{ \includegraphics[width=.8\textwidth]{cartoonBayes.pdf} }
+  \only<4>{ \includegraphics[width=.8\textwidth]{cartoon4Fisher.pdf} }
+
+\end{frame}
+
+\section{Testing Fishers Sharp Null Hypothesis of No Effects}
+
+\begin{frame}[containsverbatim,shrink]
+  \frametitle{Testing the Sharp Null of No Effects}
+
+<<>>=
+options(width=132)
+@
+
+<<sharpnulltest,echo=TRUE,results='markup',highlight=TRUE,tidy=FALSE,tidy.opts=list(width.cutoff=130)>>=
+Z <- c(0,1,0,1)
+Y <- c(16,22,7,14)
+Om <- matrix(0,ncol=choose(4,2),nrow=length(Z))
+whotrted <- combn(1:4,2)
+for(i in 1:choose(4,2)){ Om[cbind(whotrted[,i],i)]<-1 }
+meandifftz <- function(y,z){ mean(y[z==1]) - mean(y[z==0]) }
+thedist<-apply(Om,2, function(z){ meandifftz(Y,z) }) 
+rbind(Om,thedist)
+table(thedist)
+theobs <- meandifftz(Y,Z)
+mean(thedist >= theobs)
+@
+
+\end{frame}
+
+\subsection{A Real Field Experiment with 8 Cities: The Newspapers Experiment}
+
+\begin{frame}
+  \frametitle{The Newspapers Study}
+\centering
+\includegraphics[width=.9\textwidth]{newspapersIntroTable.pdf}
+
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{The Newspapers Study: $H_0: y_{i1}=y_{i0}$, $p=6/16$.}
+\centering
+\includegraphics[width=.9\textwidth]{newspapersRandDist1.pdf}
+
+\end{frame}
+
+
+\section{Sharp Hypotheses of Some Effects. Sharp Hypotheses as Causal Models}
+
+\subsection{The Constant Additive Effect Model}
+
+\begin{frame}
+	\frametitle{What range of effects might be surprising?}
+
+	\begin{description}
+		\item[Hypothesize a model of potential outcomes]
+	For $H_0: y_{i1} = y_{i0} + \tau$, what $\tau$ might be surprising?
+
+\item[Map the model to observation via design] What would $\tau=6$ imply for
+	what we observe? If $\tau=6$ and $Y_i = Z_i y_{i1} + (1-Z_i) y_{i0}$
+	then $Y_i - Z_i 6 = y_{i0}$.
+
+\item[Generate the randomization distribution of this hypothesis] As before
+\item[Summarize information against the hypothesis] For hypotheses of $\tau
+	\ge 6$ we have $p \le .125$  using a mean difference test
+	statistic.
+\end{description}
+
+\centering
+\includegraphics[width=.7\textwidth]{newspapersFig3.pdf}
+
+\end{frame}
+
+\begin{frame}
+	\frametitle{What effects might be least surprising?}
+
+	The idea of a ``best guess'' maps onto the Hodges-Lehmann point
+	estimate: the hypotheses for which $E(t(Z,Y)=0$: ex. the difference of
+	means is zero. Here $\tau=1.5$ for the mean difference and
+	$\tau=3.25$ for the rank-based test (which equalizes medians).
+
+\centering
+\includegraphics[width=.9\textwidth]{newspapersHLAdj.pdf}
+
+\end{frame}
+
+\subsection{The No Effects and No Interference Model}
+
+\begin{frame}
+  \frametitle{Statistical inference for counterfactual quantities with interference?}
+
+  \centering
+  \includegraphics{complete-graph.pdf}
+
+  \only<1>{
+
+    \includegraphics[width=.95\textwidth]{interference-example.pdf}
+
+  }
+
+  \only<2>{
+    \includegraphics[width=.95\textwidth]{interference-example-2.pdf}
+
+    Introducing the \textbf{uniformity trial} $\equiv \by_{i,0000}$
+    (Rosenbaum, 2007). 
+  }
+
+
+\end{frame}
+
+\begin{frame}
+	\frametitle{Theoretical models of potential outcomes can produce sharp
+	hypotheses}
+
+
+\centering
+\only<1>{ \includegraphics[width=.9\textwidth]{fishersutvaNetwork.pdf} }
+\only<2>{ \includegraphics[width=.9\textwidth]{fishersutvaModel.pdf} }
+\only<3>{ \includegraphics[width=.9\textwidth]{fishersutvaResults.pdf} }
+
+
+
+\end{frame}
+
+\begin{frame}{A General Fisherian Inference Algorithm}
+  \begin{enumerate}
+    \item Write a model ($\HH(\yu, \bz, \theta)$) converting uniformity trial
+      into observed data (i.e. a causal model).
+    \item Solve for $\yu$: $\HH(\by_\bz, \bzero, \theta_0) = \yu$
+    \item Select a test statistic that is effect increasing in all relevant
+	    dimensions.
+    \item Compute $p$-values for substantively meaningful range of $\theta$.
+	    Or calculate boundaries of regions.
+  \end{enumerate}
+
+
+  \note{So, let me just summarize our workflow --- which, for those of you
+    familiar with Rosenbaum's approach to Fisher's hypothesis testing, will be
+    very familiar.}
+
+\end{frame}
+
+
+\section{Aspects of the approach: The tests do not require asymptopia.}
+
+\begin{frame}
+	\frametitle{Fisherian Tests work when asymptopia is out of reach}
+
+\centering
+\only<1>{\includegraphics[width=.9\textwidth]{newspapersTDist.pdf} }
+\only<2>{\includegraphics[width=.9\textwidth]{newspapersTypeIError.pdf} }
+
+\end{frame}
+
+\section{Information arises from both theory and instruments}
+
+\begin{frame}
+	\frametitle{Robust test statistics can increase power.}
+
+	For the simple mean difference test statistic, we have $p=.375$, for a
+	rank sum test (the sum of the ranks of the treated units), we have a
+	$p=.4375$, and for an M-estimator based test (like mean-differences
+	but with weights roughly inversely proportional to the
+	Cook's $D$ influence measure) we have $p=.3125$. 
+
+	\centering
+	\includegraphics[width=.8\textwidth]{newspapersCooksD.pdf}
+
+\end{frame}
+
+\begin{frame}
+	\frametitle{Covariance adjusted tests can increase power.}
+
+	Using the difference pre-vs-post as the outcome (comparing treated
+	pre-vs-post with paired control pre-vs-post), and using the robust
+	test statistic for $H_0: y_{i1}=y_{i0}$ $p=4/16=.25$.
+
+	Using $e_i = (Y_i - Y_{i,t-1}) - (\hat{\beta}_0 + \hat{\beta}_1\text{pop} +
+	\hat{\beta}_2 \text{num candidates})$ and the robust test statistic to
+	test $H_0: y_{i1}=y_{i0}$  we have  $p=2/16=.125$.
+
+
+\end{frame}
+
+\section{Summary and Discussion}
+
+\begin{frame}
+	\frametitle{Key features of Fisher's approach}
+
+	\begin{description}
+		\item[Flexible] Any scientific model than can generate
+			implications for all units' potential outcomes can, in
+			principle, produce testable parameters.
+		\item[Design based] Requires knowledge of probability of $Z$
+			not $Y$ or $Y|X$ or $\beta|\gamma$. 
+		\item[Finite Sample Oriented] Does not require asymptopia. Can
+			use asymptopia when there for a visit.
+		\item[Can be slow] In between 8 cities and asymptopia is a
+			land of many permutations.
+		\item[Probably conservative] Uses relatively little of the
+			total information we have available about the science.
+	\end{description}
+
+	\textcolor{orange}{If you want to know more read Paul Rosenbaum's work}
+	The version of Fisher's approach I discuss here is built on work by Paul
+	Rosenbaum. Read his work if you want to learn more.
+
+\end{frame}
+
+
+\appendix
+
+\section{Appendix}
+
+\begin{frame}
+	\frametitle{New Questions}
+      \begin{itemize}
+	\item How to choose test statistics for multidimensional
+	  sharp-hypothesis testing? Are there multi-dimensional ``effect
+	  increasing'' characteristics that we can assess for a given model?
+	\item Are there general classes of scientific/counterfactual models?
+	\item How should we interpret and display results?
+      \end{itemize}
+\end{frame}
+
+
+\begin{frame}[t]
+  \frametitle{On models}
+  \begin{itemize}
+      %    \item It is easy to reject hypothesis generated from incongruent models.
+    \item Models are mathematical functions, multiple functions can have
+      similar adjustments to the data. %Scientifically interesting.
+    \item Assessing more than one model may enhance insight (Rosenbaum, 2010).
+    \item When more than one model is plausible, what should you do?
+    \item Our method can help eliminate the implausible, not accept the
+      plausible.
+  \end{itemize}
+
+
+  \note{
+
+    This kind of display, which we cribbed from Rosenbaum's latest book,
+    provides a kind of graphical indication of model fit (in a
+    sense). That is, if a model does remove the effect, then the two
+    groups look like two random samples from the same urn. If a model is
+    not-rejected, but the boxplots do not line up, then we can know that
+    we have little power to distinguish hypotheses that may be visually
+    distinctive.
+  }
+
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{New Questions}
+  \begin{itemize}
+    \item<1-> Where do models of counterfactuals come from? Do we have advice
+      about going from words to math?
+    \item<2-> Math has its own logic. Some expressions for models may not be
+      sensitive to changes in parameters. How can we assess what a given model
+      is telling? How can we go from math to words before testing hypotheses?
+    \item<3-> The KS-statistic is low powered for tail-differences. Recall that we
+      are testing $t(\HH(),\bz)$ not just $\HH()$. Some results might tell us
+      that our test is low powered against certain alternatives more than that
+      we have identified a region of plausibility. How to find a better test
+      statistic?
+    \item<4-> How can this work learn from other modes of statistical inference
+      and other representations of causal inference? What are the connections to ATE and other estimation frameworks
+      (Spatial Econometrics, Network Analysis (ERGMs), etc\dots)?
+  \end{itemize}
+\end{frame}
+
+% \clearpage
+% \bibliographystyle{asa}
+% \bibliography{../BIB/big}
+% \bibliography{/Users/jwbowers/Documents/BIB/trunk/big}
+
+\end{document}
+
+%%% Local Variables:
+%%% TeX-master: "presentation"
+%%% End:
