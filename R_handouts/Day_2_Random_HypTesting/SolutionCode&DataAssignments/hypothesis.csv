@@ -1,0 +1,124 @@
+"","SchoolID","SchoolName","Language","Gender","treat","testscore"
+"1",101,"Babajipura G.M.M.Kumar shala No. 1","Gujarati","Kumar",0,33.2743904390372
+"2",103,"Babajipura Kanya Shala No. 3","Gujarati","Kanya",1,64.0916255366122
+"3",107,"Babajipura Mishra Shala No. 7","Gujarati","Mishra",1,54.0004127376054
+"4",108,"Babajipura Mishra Shala No. 8","Gujarati","Mishra",1,83.8551518616525
+"5",112,"Babajipura Marathi Mishra Shala No. 12","Marathi","Mishra",1,68.3641413744868
+"6",113,"Babajipura Kanya Shala No. 13","Gujarati","Kanya",0,58.5708881332539
+"7",114,"Babajipura Mishra Shala No. 14","Gujarati","Mishra",1,56.1199867997322
+"8",117,"Babajipura Kumar Shala No. 17","Gujarati","Kumar",0,56.2206451152451
+"9",118,"Babajipura Mishra Shala No. 18","Gujarati","Mishra",0,42.2296927613206
+"10",119,"Babajipura Mishra Shala No. 19","Gujarati","Mishra",1,72.206905251496
+"11",120,"Babajipura Mishra Shala No. 20","Gujarati","Mishra",0,76.6615648241714
+"12",121,"Babajipura Mishra Shala No. 21","Gujarati","Mishra",1,66.0268333629074
+"13",125,"Babajipura Kumar Shala No. 25","Gujarati","Kumar",1,70.3771009282656
+"14",126,"Babajipura Kanya Shala No. 26","Gujarati","Kanya",0,42.8461021347903
+"15",127,"Babajipura Mishra Shala No. 27","Gujarati","Mishra",0,71.6584632825106
+"16",128,"Babajipura Mishra Shala No. 28","Gujarati","Mishra",1,76.9837100262768
+"17",130,"Babajipura Hindi Mishra Shala No. 30","Hindi","Mishra",1,84.1837514879017
+"18",131,"Babajipura Mishra Shala No. 31","Gujarati","Mishra",0,41.1478140461259
+"19",132,"Babajipura Mishra Shala No. 32","Gujarati","Mishra",1,44.1595428570944
+"20",201,"Fatehpura Kumar Shala No. 1","Gujarati","Kumar",0,72.2102802200243
+"21",202,"Fatehpura Mishra Shala No. 2","Gujarati","Mishra",1,75.1675960656579
+"22",209,"Fatehpura Mishra Shala No. 9","Gujarati","Mishra",1,50.6070199129578
+"23",210,"Fatehpura Kanya Shala No. 10","Gujarati","Kanya",1,47.9452205754252
+"24",211,"Fatehpura Mishra Shala No. 11","Gujarati","Mishra",1,66.3173693586445
+"25",213,"Fatehpura Kumar Shala No. 13","Gujarati","Kumar",1,61.6142137068377
+"26",215,"Fatehpura Hindi Mishra Shala No. 15","Hindi","Mishra",1,41.5998022435341
+"27",216,"Fatehpura Mishra Shala No. 16","Gujarati","Mishra",1,84.3834041001649
+"28",218,"Fatehpura Mishra Shala No. 18","Gujarati","Mishra",0,42.4802419682965
+"29",219,"Fatehpura Mishra Shala No. 19","Gujarati","Mishra",0,71.1168242106214
+"30",301,"N. Sayajiganj Mishra Shala No. 1 (center)","Gujarati","Mishra",0,34.1226624161936
+"31",303,"N. Sayajiganj Marathi Mishra Shala No. 3","Marathi","Mishra",0,42.5772565836087
+"32",305,"Sayajiganj Mishra Shala No. 5","Gujarati","Mishra",0,38.9867805945687
+"33",306,"Sayajiganj Kumar Shala No. 6","Gujarati","Kumar",0,71.6308803367428
+"34",307,"Sayajiganj Mishra Shala No. 7","Gujarati","Mishra",1,59.8705763754342
+"35",308,"Sayajiganj Kumar Shala No. 8","Gujarati","Kumar",0,77.4676343379542
+"36",309,"Sayajiganj Mishra Shala No. 9","Gujarati","Mishra",0,70.8484942745417
+"37",310,"Sayajiganj Kumar Shala No. 10","Gujarati","Kumar",1,82.4648777212643
+"38",311,"Sayajiganj Mishra Shala No. 11","Gujarati","Mishra",0,55.3588883555494
+"39",312,"Sayajiganj Mishra Shala No. 12","Gujarati","Mishra",0,77.5242971559055
+"40",313,"Sayajiganj Mishra Shala No. 13","Gujarati","Mishra",0,77.5902373553254
+"41",314,"Sayajiganj Kumar Shala No. 14","Gujarati","Kumar",1,56.5751812521734
+"42",315,"Sayajiganj Hindi Mishra Shala No. 15","Hindi","Mishra",1,46.448908341453
+"43",316,"Sayajiganj Kanya Shala No. 16","Gujarati","Kanya",0,65.3397798840888
+"44",317,"Sayajiganj Kanya Shala No. 17","Gujarati","Kanya",1,48.0561968466317
+"45",318,"Sayajiganj Kumar shala No. 18","Gujarati","Kumar",1,51.2107752545534
+"46",320,"Sayajiganj Mishra Shala No. 20","Gujarati","Mishra",0,49.5595146738924
+"47",321,"Sayajiganj Kumar shala No. 21","Gujarati","Kumar",0,69.7391154430807
+"48",322,"Sayajiganj Mishra Shala No. 22","Gujarati","Mishra",1,70.8114540128015
+"49",323,"Sayajiganj Mishra Shala No. 23","Gujarati","Mishra",0,34.8533586203121
+"50",324,"Sayajiganj Mishra Shala No. 24","Gujarati","Mishra",1,48.4143802169401
+"51",325,"Sayajiganj Mishra Shala No. 25","Gujarati","Mishra",1,65.7227268753412
+"52",326,"Sayajiganj Hindi Mishra Shala No. 26","Hindi","Mishra",1,65.2874815379311
+"53",327,"Sayajiganj Marathi Mishra Shala No. 27","Marathi","Mishra",0,36.6420191433281
+"54",329,"Sayajiganj Marathi Mishra Shala No. 29","Marathi","Mishra",1,48.1922533006669
+"55",331,"Sayajiganj Mishra Shala No. 31","Gujarati","Mishra",1,45.7675202086432
+"56",332,"Sayajiganj Hindi Mishra Shala No. 32","Hindi","Mishra",1,43.5565438938008
+"57",334,"Sayajiganj Mishra Shala No. 34","Gujarati","Mishra",1,52.5792080107911
+"58",337,"Sayajiganj Kanya Shala No. 37","Gujarati","Kanya",0,62.6874476391822
+"59",338,"Sayajiganj Kanya Shala No. 38","Gujarati","Kanya",1,50.0416443956977
+"60",340,"Sayajiganj Kanya Shala No. 40","Gujarati","Kanya",1,53.6305594812264
+"61",341,"Sayajiganj Kanya Shala No. 41","Gujarati","Kanya",1,75.5951864117946
+"62",342,"Sayajiganj Hindi Mishra Shala No. 42","Hindi","Mishra",0,65.1151863578707
+"63",344,"Sayajiganj Mishra Shala No. 44","Gujarati","Mishra",1,81.0399042703057
+"64",345,"Sayajiganj Mishra Shala No. 45","Gujarati","Mishra",1,73.6711765533095
+"65",346,"Sayajiganj Hindi Mishra Shala No. 46","Hindi","Mishra",0,40.3752852417529
+"66",347,"Sayajiganj Hindi Mishra Shala No. 47","Hindi","Mishra",0,30.8274967665784
+"67",348,"Sayajiganj Mishra Shala No. 48","Gujarati","Mishra",0,50.1753117726184
+"68",349,"Sayajiganj Mishra Shala No. 49","Gujarati","Mishra",1,38.3262791541042
+"69",350,"N. Sayajiganj Mishra Shala No. 50","Gujarati","Mishra",1,78.4515058063103
+"70",401,"Raopura Mishra Shala No. 1","Gujarati","Mishra",0,48.6743744416162
+"71",405,"Raopura Kanya Shala No. 5","Gujarati","Kanya",1,61.0901785851285
+"72",407,"Raopura Kumar Shala No. 7","Gujarati","Kumar",1,81.2996737706819
+"73",408,"Raopura Kanya Shala No. 8","Gujarati","Kanya",1,39.1757157438179
+"74",409,"Raopura Marathi Mishra Shala No. 9","Marathi","Mishra",1,65.5673891827261
+"75",410,"Raopura Kumar Shala No. 10","Gujarati","Kumar",0,54.3171466048807
+"76",411,"Raopura Kumar Shala No. 11","Gujarati","Kumar",0,77.9968022555113
+"77",417,"Raopura Mishra shala No. 17","Gujarati","Mishra",0,58.042702365201
+"78",423,"Raopura Mishra shala No. 23","Gujarati","Mishra",1,81.5403946927402
+"79",424,"Raopura Mishra shala No. 24","Gujarati","Mishra",0,32.9492351925001
+"80",425,"Raopura Mishra shala No. 25","Gujarati","Mishra",0,47.7125353366137
+"81",501,"Shaher Vibhag Mishra Shala No. 1","Gujarati","Mishra",1,73.792446895673
+"82",502,"Shaher Vibhag Mishra Shala No. 2","Gujarati","Mishra",0,34.6392530901358
+"83",503,"Shaher Vibhag Kanya Shala No. 3","Gujarati","Kanya",0,64.6878899494186
+"84",504,"Shaher Vibhag Kanya Shala No. 4","Gujarati","Kanya",1,57.0670834834116
+"85",506,"Shaher Vibhag Mishra Shala No. 6","Gujarati","Mishra",1,83.3923717028562
+"86",508,"Shaher Vibhag Mishra Shala No. 8","Gujarati","Kumar",0,76.605149586685
+"87",509,"Shaher Vibhag Mishra Shala No. 9","Gujarati","Mishra",1,71.009364218751
+"88",510,"Shaher Vibhag Mishra Shala No. 10","Gujarati","Mishra",0,76.9751454889774
+"89",511,"Shaher Vibhag Mishra Shala No. 11","Gujarati","Mishra",1,76.109985764023
+"90",514,"Shaher Vibhag Mishra Shala No. 14","Gujarati","Mishra",0,79.6422306052409
+"91",515,"Shaher Vibhag Mishra Shala No. 15","Gujarati","Mishra",0,75.2312205801718
+"92",516,"Shaher Vibhag Mishra Shala No. 16","Gujarati","Mishra",1,47.4000341584549
+"93",522,"Shaher Vibhag Mishra Shala No. 22","Gujarati","Mishra",0,62.0286559755914
+"94",523,"Shaher Vibhag Marathi Mishra Shala No. 23","Marathi","Mishra",0,69.2761191236787
+"95",524,"Shaher Vibhag Mishra Shala No. 24","Gujarati","Mishra",0,72.0638117357157
+"96",525,"Shaher Vibhag Mishra Shala No. 25","Gujarati","Mishra",0,74.7274013306014
+"97",526,"Shaher Vibhag Mishra Shala No. 26","Gujarati","Mishra",1,60.6049390910524
+"98",527,"Shaher Vibhag Mishra Shala No. 27","Gujarati","Mishra",1,81.3632246013954
+"99",528,"Shaher Vibhag Mishra Shala No. 28","Gujarati","Mishra",1,72.9712283138842
+"100",529,"Shaher Vibhag Mishra Shala No. 29","Gujarati","Mishra",1,68.5265219689932
+"101",601,"Wadi Mishra Shala No. 1","Gujarati","Mishra",0,46.1157610127702
+"102",602,"Wadi Mishra Shala No. 2","Gujarati","Mishra",0,58.0553444288671
+"103",603,"Wadi Mishra Shala No. 3","Gujarati","Mishra",0,69.2419252777472
+"104",611,"Wadi Marathi Mishra Shala No. 11","Marathi","Mishra",0,57.1645859465934
+"105",614,"Wadi Mishra Shala No. 14","Gujarati","Mishra",0,74.8463830747642
+"106",615,"Wadi Mishra Shala No. 15","Gujarati","Mishra",0,39.9009235971607
+"107",616,"Wadi Kumar Shala No. 16","Gujarati","Kumar",1,38.8659689778133
+"108",617,"Wadi Marathi Mishra Shala No. 17","Marathi","Mishra",1,44.7667588771884
+"109",618,"Wadi Kumar Shala No. 18","Gujarati","Kumar",1,86.7525327695019
+"110",619,"Wadi Mishra Shala No. 19","Gujarati","Mishra",0,45.1379306451418
+"111",621,"Wadi Mishra Shala No. 21","Gujarati","Mishra",0,59.5178082538769
+"112",622,"Wadi Mishra Shala No. 22","Gujarati","Mishra",0,34.5319390133955
+"113",623,"Wadi Kanya Shala No. 23","Gujarati","Kanya",0,39.6927462960593
+"114",624,"Wadi Mishra Shala No. 24","Gujarati","Mishra",0,68.5542815667577
+"115",625,"Wadi Kumar Shala No. 25","Gujarati","Kumar",0,60.7888451381586
+"116",626,"Wadi Hindi Mishra Shala No. 26","Hindi","Mishra",1,62.2255111739773
+"117",632,"Wadi Kanya Shala No. 32","Gujarati","Kanya",1,57.7096063864944
+"118",633,"Wadi Kanya Shala No. 33","Gujarati","Kanya",1,80.6469003991726
+"119",634,"Wadi Mishra Shala No. 34","Gujarati","Mishra",0,38.1202111206949
+"120",637,"Wadi Mishra Shala No. 37","Gujarati","Mishra",0,52.3614601651207
+"121",638,"Wadi Hindi Mishra Shala No. 38","Hindi","Mishra",0,66.4290376892313
+"122",639,"Wadi Mishra Shala No. 39","Gujarati","Mishra",1,75.0300979006131
+"123",640,"Wadi Mishra Shala No. 40","Gujarati","Mishra",1,83.5701302642149

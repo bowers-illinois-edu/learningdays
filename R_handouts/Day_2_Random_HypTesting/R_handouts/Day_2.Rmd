@@ -1,0 +1,830 @@
+---
+title: "Key Tools for Experimental Research Design and Analysis in R"
+subtitle: "EGAP Experiments Workshop"
+author: "Santiago, Chile - May, 2016"
+date: "Day 2: Hypotheses Testing and Randomization"
+output: pdf_document
+---
+
+
+#Today
+
+First Steps in Causal inference using R:
+
+*Review: Simple statistics.
+  +Vectors
+  +Key statistics
+  +Sampling From Distributions
+  +The Central Limit Theorem
+*Randomization:
+  +Randomization Strategies
+  +Problem set: see separate pdf
+*Hypothesis Testing: 
+  +Parametric hypothesis testing
+  +Randomization Inference
+  +Problem set: see separate pdf
+
+
+#1. Simple Statistics
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60),warning=FALSE, message=FALSE}
+
+# 1. Vectors
+# 2. Key statistics
+# 3. Sampling From Distributions
+# 4. The Central Limit Theorem
+
+# install if needed: 
+# install.packages("Hmisc")
+library(Hmisc)
+
+# 1. Vectors
+##############################################################################
+# We start by creating a sequence of  numbers. 
+# Here is a very simple sequence
+integers <- c(1,2,3,4,5,6,7,8,9,10)
+integers
+
+# there is a more compact way of creating a sequence like this:
+integers <- 1:100
+integers
+
+# or
+integers <- seq(1,100, 1)
+integers
+
+# 2. Key Statistics
+##############################################################################
+# so now we have a set of numbers. We can think of these numbers as
+# a "vector", a "variable", or a "draw from a distribution"
+# Now for some key features of this vector.
+
+# THe size of the vector
+length(integers)
+
+# Lets store this:
+n <- length(integers)
+
+# The sum of the vector
+sum(integers)
+
+# The mean
+mean(integers)
+
+# To caulcate the mean manually:
+sum(integers)/length(integers)
+
+# The median
+median(integers, na.rm=FALSE)
+
+# The variance
+var(integers)
+
+# To calculate the variance manually:
+mean((integers-mean(integers))^2)*(n/(n-1))
+
+# The standard deviation
+sd(integers)
+
+# The square of the standard deviation
+sd(integers)^2
+
+# The biggest number
+max(integers)
+
+# THe smallest  number
+min(integers)
+
+# The 15th percentile (similar for any percentile)
+quantile(integers, .15)
+
+# You can look at many of these statistics  at once
+summary(integers)
+
+describe(integers)
+
+# you can graph this vector in many ways
+# a histogram
+hist(integers)
+
+# a box plot
+boxplot(integers)
+
+# 3. Random samples
+##############################################################################
+# Now lets generate random samples of numbers and look at their properties
+# Lets start simple and say we have a vector with just two numbers, 0 and 1
+x <- 0:1
+
+# We can sample one number from this vector like this
+sample(x,1)
+# and again
+sample(x,1)
+# and again
+sample(x,1)
+
+# If we did this many many times we would build up a new vector 
+# where each number in the vector is a coin flip. Our vector would then 
+# be a draw from a Bernoulli distribution.
+
+# Lets do a 10 draws from (0,1) and put them into a new vector called "draws"
+# we first create a placeholder vector:
+draws<-NA
+# we then sample 10 times and each time put the result into position i in the new vector
+for(i in 1:10) draws[i]<- sample(x,1)
+# Lets look at the variable
+draws
+# The new variable we have made should have a mean close to .5 and a standard deviation close to .5. 
+mean(draws)
+sd(draws)
+# The histogram of this variable is like a bar chart:
+hist(draws)
+# The number of 1's in our draw is just the sum of all elements in the vector draws
+sum(draws)
+
+# TIP: above we used a "loop" to create the new variable but often this can be done 
+# much more compactly using the sapply function
+# in this case this would be done in one line rather than two lines like this
+
+sapply(1:10, function(i) sample(x,1))
+
+# TIP 2: When we use sample we can also speed things up by asking for many draws at once, assuming each draw is done "with replcaement"
+sample(0:1, 10, replace = TRUE)
+
+# Say now we did this whole operation 10 times
+# we first create a new  vector
+draws2<-NA
+# we then do the previous operation 10 times 
+for(i in 1:10) draws2[i]<- {sum(sample(0:1, 10, replace = TRUE))}
+
+# Or more compactly
+draws2<-sapply(1:10, function(i)  {sum(sample(0:1, 10, replace = TRUE))})
+# draws2 is a "Binomial" distribution. Each number in the vector is the number of 
+# heads from 10 coin tosses. Lets look at it.
+draws2
+# And lets graph the result
+hist(draws2)
+# You should see a few 5s and probably some 4s and 6s. Maybe some other numbers also.
+# Compare the two graphs
+# To get a good feel for the distribution though we should do this more than 10 times. 
+# Lets do it 1000 times.
+
+draws2<-sapply(1:1000, function(i)  {sum(sample(0:1, 10, replace = TRUE))})
+
+# And lets graph the result
+hist(draws2)
+# Again compare this to the graph you had before, what do you see?
+# This should now be a nice symmetric distribution. Its a "Binomial" distribution.
+
+# There are existing R function to generate many types of distribution 
+# For example you can get 10 random numbers from a uniform distribution like this:
+runif(10)
+
+# Or more generally, for values between 2 and 4 
+runif(10, min = 2, max = 4)
+
+# If you wanted to draw from a discrete uniform distribution you could do it like this
+floor(runif(10, 1, 11))
+# where floor means we are rounding off to the lower interger 
+# the second value is the low end of the range and the third value the upper end
+
+# You can take 10 draws from a standard normal distribution like this:
+rnorm(10)
+# Or more generally, with mean = 5 and sd = 3 
+rnorm(10, mean = 5, sd = 3)
+
+# We can take samples from a Binomial distribution like this
+rbinom(10, 5, .5)
+rbinom(10, 1000, .5)
+# Here the first number is the number of draws, the second number is the number of
+# Bernouli trials in each draw and the third number is the underlying probability
+
+# So instead of 
+# sapply(1:1000, function(i)  sum({sapply(1:10, function(j) sample(c(0:1),1))}))
+# We could have just done
+# rbinom(1000, 10, .5)
+
+# We can also take our Bernoulli trials like this
+sample(0:1, 100, replace=TRUE)
+
+# or like this
+rbinom(100, 1, .5)
+
+# or like this
+(runif(100)<.5)*1
+
+# 4. Samples of samples and the Central Limit THeorem
+##############################################################################
+
+# Consider again the graph of the Binomial distribution we generated
+
+hist(rbinom(1000, 10, .5))
+
+# You might notice that this looks a bit like a normal distribution. 
+# There is a reason for that:
+# The distribution of the mean of random samples tends towards a Normal distribution as the 
+# size of the samples gets large. That's the central limit theorem. 
+# The Binomial distribution is the distribution of sums (rather than means) of 
+# draws from a Bernoulli distribution. So it behaves the same way.
+# A small change in our code illustrates the Central Limit Theorem nicely:
+
+# We made as few changes. Can you see what and why?
+hist(rbinom(100000, 10000, .5)/10000, breaks = 50)
+
+# It's amazing that you can generate a normal distribution like this using 
+# only a set of coin flips. To make this more explicit
+# Create a big matrix of 0s and 1s
+flips = matrix(sample(0:1, 10000000, replace=TRUE), 10000,1000)
+
+# and graph the means of each row
+hist(apply(flips, 1, mean), breaks = 50)
+
+```
+
+#2. Randomization
+
+##2.a. Randomization Strategies
+
+In this session we will go over different randomization strategies. We start by making a database, which simulates an experiment and includes a full schedule of potential outcomes for each observation. 
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60),warning=FALSE, message=FALSE}
+
+rm(list = ls())
+set.seed(12345)
+
+# Make a dataset ----------------------------------------------------------
+
+# We are going to look at the example of an experiment where people are randomly
+# assigned to receive a free water sanitation device. We are interested in
+# whether the treatment reduces the number of days in the year that the person 
+# was sick. We will look at different ways the treatment can be assigned.
+
+# We conduct a survey in 10 villages
+
+(villages <- c("vill 01","vill 02","vill 03","vill 04","vill 05",
+              "vill 06","vill 07","vill 08","vill 09","vill 10"))
+
+# We randomly sample 60 people in each village
+
+(samples <- c(60,60,60,60,60,
+             60,60,60,60,60))
+
+# So our total sample size, N, is 10 x 60, or the sum of our samples
+
+(N <- sum(samples))
+
+# Generate a unique number for each person in our total sample
+
+(ID <- 1:N)
+
+# Now let's generate a variable telling us what village each person came 
+# from:
+
+village <- rep(x = villages,    # Repeat the names of the villages
+               times = samples) # 60 times for each village
+
+# Let's look at the ID and village for each person:
+
+head(cbind(ID,village),30)
+
+# Now generate a variable that is 1 if the person is female, and 0 if male
+
+(female <- rep(c(rep(1,30),rep(0,30)),10)) # 30 femals in each village sample
+
+# Let's now generate how many days in the year people would have been sick for
+# if they did not receive the water sanitation device. 
+
+(days.sick.no.device <- rnbinom(n = N,mu = 10,size = 1) + 7)
+
+# Let's also imagine that some villages are hit by 
+# an outbreak of a virus that means people in those villages were all sick 
+# 5 times more during the year under study.
+
+# Define the effect of having an outbreak in your village:
+
+(outbreak.effect <- 5)    # the effect is 5 days
+
+# Let's randomly choose 3 of the 10 villages that were hit by the virus
+
+(outbreak.villages <- sample(x = villages,size = 3))
+
+# Add the effect to the people in those villages using an if / else function, 
+# this is the 'control' potential outcome for the people in our experiment
+
+(Y0 <- 
+     ifelse(
+          # Is the person's village in the outbreak list?
+          test = village %in% outbreak.villages,    
+          # If yes, then give that person the outbreak effect
+          yes = days.sick.no.device + outbreak.effect,
+          # If no, then don't increase the number of days they were sick
+          no = days.sick.no.device + 0
+     ))
+
+# Now let's generate the treatment effects, but let's imagine that the treatment
+# is less effective for men on average than it is for women.
+
+# If a male receives the treatment, he gets sick 2 times fewer in a year
+
+(effect.male <- -2) 
+
+# If a female receives the treatment, she gets sick 7 times fewer in a year
+
+(effect.female <- -7)
+
+# We can use the ifelse() function again 
+
+(Y1 <- 
+     ifelse(
+          # Is the person a female?
+          test = female == 1,
+          # If yes, then give that person the female effect
+          yes = Y0 + effect.female,
+          # If no, then give that person the male effect
+          no = Y0 + effect.male
+     ))
+
+# Now we have our experimental dataset: 
+
+data <- data.frame(
+     ID = ID,
+     village = village,
+     female = female,
+     Y0 = Y0,
+     Y1 = Y1
+)
+
+head(data)
+```
+
+With have our experimental database ready, we can now go over the code for making random assignments. As you saw earlier today, there are multiple ways in which a researcher/practitioner can assign subjects to treatment conditions. We will explore four of these options: simple random assignment, complete random assignment, clustered random assignment, and blocked random assignment.  
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60),warning=FALSE, message=FALSE}
+
+# 1. Simple Random Assignment ------------------------------------------------
+
+# Simple random assignment is the same as flipping a coin: every person 
+# receives the treatment with probability of .5, but we don't know in
+# advance how many people will receive treatment 
+
+# Run this code several times, which is the equivalent of flipping a coin
+# 4 times:
+rbinom(n = 4,size = 1,prob = .5)
+
+# Let's assign treatment to our people using simple assignment:
+
+# set the random number seed
+set.seed(12345)
+
+# Generate the simple random assignment 
+# (Notice that in an experiment we have a single trial and, 
+# thus, size=1)
+(simple.ra <- rbinom(n = N,size = 1, prob = .5))
+
+# 330 people ended up in the treatment group
+sum(simple.ra)
+
+# Let's add it to our data
+
+data$simple.ra <- simple.ra
+
+head(data)
+
+# And let's generate the outcome we would have observed under this assignment
+
+data$simple.obs <- with(data,Y1*simple.ra+Y0*(1-simple.ra))
+
+head(data)
+
+# 2. Complete Random Assignment ----------------------------------------------
+
+# Imagine we only had 200 devices to assign to people. In this case, simple 
+# random assignment would be inappropriate, as we are likely to assign too many 
+# (or too few) people to treatment. 
+
+# Complete random assignment let's us determine exactly how many people we want
+# to assign to treatment before we run the randomization.
+
+# Generate a list of 200 1's and 400 0's
+
+(complete.ra <- c(rep(1,200),
+                 rep(0,N-200)))
+
+# And then scramble it randomly using sample()
+
+set.seed(12345)
+# Notice that the default is sampling without replacement
+(complete.ra <- sample(complete.ra)) 
+
+sum(complete.ra)
+
+# Let's add it to the data
+
+data$complete.ra <- complete.ra
+
+head(data)
+
+# And let's generate the outcome we would have observed under this assignment
+
+data$complete.obs <- with(data,Y1*complete.ra+Y0*(1-complete.ra))
+
+head(data)
+
+# 3. Clustered Random Assignment ---------------------------------------------
+
+# Finally, sometimes it might be necessary to assign the treatment at the 
+# village level: i.e. rather than assigning the treatment to individuals, we
+# assign it to whole villages at a time (by 'cluster'). When treatment is not
+# clustered by village, you can have people who are and are not assigned to
+# treatment within a single village, whereas when you assign treatment by
+# village clusters, everyone within a village assigned to treatment is treated.
+
+# Let's imagine we have 300 devices, but we are worried that people will share
+# them with their neighbors, so our treatment and control groups could be 
+# compromised within villages. Instead, we just assign five of the villages
+# to treatment, and the others to control. 
+
+# Firstly, we randomly select 5 villages from our list:
+
+set.seed(12345)
+(treat.vills <- sample(x = villages,size = 5))
+
+# Now we generate a list of treatments by testing whether each person is 
+# within a village in this randomly-selected list.
+
+cluster.ra <- ifelse(
+     # Is the village in the list?
+     test = village%in%treat.vills,  
+     # If yes, give a 1
+     yes = 1,
+     # If no, give a 0
+     no = 0)
+
+#Note, in the above function, %in% returns a logical vector indicating if 
+#the elements in "village" are in the list "treat.vills". 
+
+sum(cluster.ra)
+
+# Let's add it to the data
+
+data$cluster.ra <- cluster.ra
+
+head(data)
+
+# And let's generate the outcome we would have observed under this assignment
+
+data$cluster.obs <- with(data,Y1*cluster.ra+Y0*(1-cluster.ra))
+
+head(data)
+
+# 4. Blocked Random Assignment -----------------------------------------------
+
+# As we saw above, when women receive the treatment, it has a bigger effect. If 
+# proportionally more men than women receive the treatment, then we will 
+# actually underestimate the average effect. Moreover, some villages experienced
+# breakouts, while some didn't. If, just by chance, most of the treated were in 
+# breakout villages, we would underestimate the treatment effect.
+
+# To avoid this situation, we can ensure that equal numbers of people from each
+# village sample, and equal numbers of women and men, are in treatment and
+# control.
+
+# With 10 villages, and 200 devices, we can assign 20 devices to each village.
+# We can look at the data, and see that there are 30 men and 30 women in each
+# village.
+
+table(data$village,data$female)
+
+# Thus, we can assign 10 devices to women and 10 to men in each village.
+
+# Because our data is ordered by village and gender, it is relatively simple to
+# carry out the blocked randomization. For more complex or unbalanced datasets,
+# it is easier to use the pre-made functions in the two packages discussed 
+# below. 
+
+# To do the block randomization, we do complete random assignment of 10 devices
+# in blocks of 30: this ensures that 10 women and 10 men in each village are 
+# assigned to treatment. 
+
+# The vector of assignments we will reshuffle in each gender in each village
+
+(treatment.by.gender <- c(rep(1,10),rep(0,20)))
+
+# "replicate" repeats an expression in R and returns the results AS A VECTOR:
+
+(block.ra <- as.vector(replicate(
+     # Do this twice for each village
+     n = length(villages)*2, 
+     # Scramble the vector of treatments
+     expr = sample(treatment.by.gender))))
+
+# We can see that the treatment is balanced:
+table(female,block.ra)
+table(village,block.ra)
+
+# Add it to the data
+data$block.ra <- block.ra
+
+head(data)
+
+# And let's generate the outcome we would have observed under this assignment
+
+data$block.obs <- with(data,Y1*block.ra+Y0*(1-block.ra))
+
+head(data)
+
+```
+
+With all these random assignment tools, we can now estimate the effects. We will go back to this tomorrow in our R session but let's take a first look. 
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60),warning=FALSE, message=FALSE}
+
+# Let's estimate the true average treatment effect, which we do not observe: 
+
+true.ATE <- with(data,mean(Y1)-mean(Y0))
+
+# Now let's look at the estimates:
+
+simple.ATE <- with(data,
+     mean(simple.obs[simple.ra==1]) - mean(simple.obs[simple.ra==0]))
+
+
+complete.ATE <- with(data,
+                   mean(complete.obs[complete.ra==1]) - mean(complete.obs[complete.ra==0]))
+
+block.ATE <- with(data,
+                  mean(block.obs[block.ra==1]) - mean(block.obs[block.ra==0]))
+
+cluster.ATE <- with(data,
+                  mean(cluster.obs[cluster.ra==1]) - mean(cluster.obs[cluster.ra==0]))
+
+# Let's compare:
+
+c(true.ATE = true.ATE,
+  simple.ATE = simple.ATE,
+  complete.ATE = complete.ATE,
+  block.ATE = block.ATE,
+  cluster.ATE = cluster.ATE)
+```
+
+Finally, we can do all this in R using the `randomizr` package. Let's see how this works. 
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60),warning=FALSE, message=FALSE}
+# Demonstration of the randomizr package ----------------------------------
+
+# Install and load the package:
+#install.packages("devtools")           # Uncomment if not installed. Same below
+#devtools::install_github("acoppock/randomizr")
+library(randomizr)
+
+# Simple random assignment:
+simple_ra(N = N,     # total sample size
+          prob = .5) # probability of receiving treatment
+
+# Complete random assignment:
+complete_ra(N = N,   # total sample size
+            m = 200) # amount to assign to treatment
+
+# Clustered random assignment:
+cluster_ra(clust_var = village, # the variable to cluster by
+           m = 5)               # the number of clusters
+
+# Demonstration of the blockTools package ---------------------------------
+#install.packages("blockTools")
+library(blockTools)
+
+# We want to block on gender and village
+
+# Make numbers for the villages
+data$village.number <- as.integer(data$village)
+
+blocks <- block(
+     # the data
+     data = data,
+     # the names of the variables to block on
+     block.vars = c("village.number","female"),
+     # the number of treatmend groups (here 2: treatment and control)
+     n.tr = 2,
+     # the ID variable
+     id.vars = "ID")
+
+blocktools.ra <- assignment(blocks)
+
+blockt.ra <- ifelse(
+     # Is the person assigned to treatment by blocktools?
+     test = data$ID %in% 
+          as.numeric(as.character(as.data.frame(
+               blocktools.ra[[1]])[,"X1.Treatment.2"]
+               )),
+     # If yes, return 1
+     yes = 1,
+     # If no, return 0
+     no = 0
+)
+
+```
+
+
+##2.b. Problem set (separate pdf)
+
+
+
+###Main Points to Remember About Randomization
+
+1. Random assignment helps us identify the causal effect of a variable by creating two groups of observations whose potential outcomes are equal in expectation. This eliminates the selection problem that prevents us from concluding causal lessons from observational research.
+2. An easy way to specify the size of your treatment and control groups is to generate a random number for each of your observations, sort your data according to this variable, and then assign treatment status to the first half (or whatever fraction you prefer) of your list.
+3. This is a good method especially because it limits the ability of implementers to interfere with the ordering of participants and therefore the randomization of treatment.
+4. It is possible to balance your treatment and control groups on factors that are important to you without jeopardizing random assignment. This can be useful for creating treatment and control groups with smaller variances.
+5. It is not necessary that all participants have equal probabilities of assignment to treatment, only that the probability of assignment to treatment is between 0 and 1 and that it is known. If participants have different probabilities of assignment to treatment, you will need to adjust your calculations of the average treatment effect and the standard error taking into account these different probabilities.
+
+#3. Hypothesis Testing
+ 
+##3.a. Parametric and non-parametric tests
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60),warning=FALSE, message=FALSE}
+
+# Hypothesis testing 
+##########################################################################
+
+# We want to explore if providing devices does reduce the average number 
+# of days in the year that the person was sick. To do this, we want to test whether
+# the average number of days is higher for the control group than it is for the 
+# treatment group. 
+
+# Using the complete randomization vector, we first need to calculate the average 
+# in each group for our experiment: 
+# Notice that now we will need the observed data: 
+
+av.treat <- mean(data$complete.obs[data$complete.ra==1]) 
+av.control <- mean(data$complete.obs[data$complete.ra==0]) 
+diff.mean<- av.treat-av.control 
+
+# How do we set up a test in this context? 
+# 1. Notice that if our treatment had not effect, then both averages should be 
+# the same. Therefore, our null hypothesis (H0) should be that the difference 
+# between these two means is equal to zero.  
+
+# NOTE: In particular, we want to know what is the probability to get 
+# a difference of means as extreme as the one we observe in the data
+# (perhaps in absolute terms) if the null hypothesis is true, *the p-value*.
+
+# We will do this in two ways: using a t-test and using randomization inference
+# Remember these tests pose different NULL HYPOTHESIS.
+
+
+# a. T-test 
+##############################################################
+
+# H0: Mean(# of days for treated) - Mean(# of days for control) = 0
+
+# We create a vector with the treated individuals:
+treated <- data$complete.obs[data$complete.ra==1]
+treated
+
+# And then calculate their variance 
+var1 <- sum((treated - mean(treated))^2) / (length(treated) - 1)
+var1
+
+# And we do the same with units in the control group:
+not_treated <- data$complete.obs[data$complete.ra==0]
+not_treated
+
+var0 <- sum((not_treated - mean(not_treated))^2) / (length(not_treated) - 1)
+var0
+
+# and with this we can estimate the SE of the difference of means 
+# (which we'll get back to tomorrow)
+
+estimated_se <- sqrt(var1/length(treated) + var0/length(not_treated))
+estimated_se
+
+# We estimate our t-statistic by converting to standard units:
+t_stat <- ((av.treat-av.control) - 0) / estimated_se
+t_stat
+
+# To be able to get the right Student t Distribution, we need to calculate
+# the degrees of freedom (Satterthwaite)
+df <- (var1/length(treated) + var0/length(not_treated))^2 / 
+           ((var1/length(treated))^2 / (length(treated) - 1) + 
+           (var0/length(not_treated))^2 / (length(not_treated) - 1))
+df
+
+# Where does our t statistic fall with respect to the student t distribution? 
+# Install ggplot2 if you don't have it. This is a nice package to make plots. 
+
+library(ggplot2)
+
+# Generate the sequence of different values of x
+x <- seq(-5, 5, len = 100)
+# Placeholder plot
+p <- qplot(x, geom = "blank") 
+# Plot student t distribution with the parameters just estimated: 
+# i)  df= degrees of freedom (df)
+# ii) ncp = non centrality parameter. We want it to be 0. 
+stat <- stat_function(fun=dt, args=list(df=df, ncp=0), col="black", size=1)
+# We add this distribution to placeholder plot and the estimated diff in means: 
+p + stat + geom_vline(xintercept = t_stat, col="red") 
+
+# Now we want the p-value. For that we will use the CDF of the distribution
+?pt # to understand better what we are doing
+
+# Now, do we want to perform a one tailed or two tailed test?
+
+# One tailed p-value: the distribution is centered in 0 and t_stat<0. 
+# This means that we are looking for the probability that we see 
+# a t-stat at least as SMALL (in our case) as this one (lower tail).
+
+# Two tailed p-value: here we would need the same number plus the probability that 
+# we see a t-stat greater or equal to:
+-t_stat
+
+# First, let's see what's the probability of observing a t-statistic as small
+# as the one we see: 
+pt(t_stat, df=df, ncp=0, lower.tail=TRUE)
+# Now, we need this probability plus the prob in the upper tail. We can do this
+# in one single line of code: 
+2 * pt(abs(t_stat), df, lower.tail=F)
+
+# We can also do this using the build-in R function called t.test:
+t.test(treated, not_treated, alternative="less") # one tail 
+t.test(treated, not_treated, alternative="two.sided") # two tail
+
+# Another way: we can also estimate this using a regression but we need to 
+# correct our standard errors to account for the possibility
+# of different variances between treatment and control groups.
+lm(complete.obs~complete.ra, data=data)
+
+# b. Randomization inference 
+######################################################
+
+# Recall that the SHARP null hypothesis in RI is: 
+# H0: y_i(1) - y_i(0) = 0 for ALL units
+
+# The sharp null allows us to "see" the full schedule of potential outcomes. 
+# Thus, we can generate a distribution of the estimated difference of means
+# we would have seen over replications of the experiment if the null is TRUE. 
+
+# In general there are two options to do this. 
+# 1) We produce a matrix of all possible treatment vectors by permuting  
+#    the number of treatedand total number of observations.
+# 2) If the actual number of permutations is too big, we can instead replicate treatment
+#    assignment a large number of times (e.g., 10,000 times) 
+
+
+# Because if the true parmutation matrix is too large,  
+choose(600,400)
+# we use method 2): We replicate treatment assignment 10,000 and only
+# keep unique vectors:
+perm_matrix <- matrix(NA, 10000, 600)
+for (i in 1:10000){
+perm_matrix[i,] <- sample(data$complete.ra, 600, replace=F)
+}
+perm_matrix<-unique(perm_matrix)
+
+# We now estimate the difference in means for each possible randomization. 
+
+# We can use a loop for doing this: 
+rand_ate <- NA # placeholder vector for results
+for (i in 1:nrow(perm_matrix)){ # for each one of the "fake" treatment vectors
+
+  mean_treat <- mean(data$complete.obs[perm_matrix[i,]==1])
+  
+  mean_control <- mean(data$complete.obs[perm_matrix[i,]==0])
+  
+  # calculating difference of means for this randomization
+  rand_ate[i] <- mean_treat - mean_control
+  
+}
+
+summary(rand_ate) # vector of permutation of differences. 
+
+# We can make a plot to better see the results:
+
+hist(rand_ate, breaks=50, 
+     main="Permutation distribution",
+     xlab= "Value of test statistic",
+     ylab = "Freq.", xlim=c(-5,5))
+abline(v=diff.mean, lwd=3, col="slateblue")
+
+
+# How do we calculate the p-values in this context?
+
+# One tailed
+sum(rand_ate<=diff.mean)/length(rand_ate)
+
+# Two tailed
+sum(abs(rand_ate)<=diff.mean)/length(rand_ate)
+
+```
+
+##3.b.Problem set (see separate pdf)
+
+
+###Main Points to Remember About Hypothesis Testing
+
+1. Hypothesis testing is a calculation of the probability that we can reject stated hypotheses about our treatment effect. This provides us with a means of characterizing our certainty that an estimated treatment effect approximates the true treatment effect.
+2. The most common hypothesis that we test is the sharp null hypothesis, which states that the treatment had absolutely no effect on any individual unit. To test this hypothesis, we calculate the probability that we could have observed the treatment effect we did if the treatment in reality had no effect whatsoever. This probability is known as a p-value. For example, a p-value of .05 is interpreted as a 5\% chance that we could observe a treatment effect at least as large as the one we found if the treatment in fact had no effect.
+3. It is conventional that p-values of .05 or lower are ``significant''. This is an arbitrary cutoff, but it is so widely used in statistics that any study that fails to recover a p-value of less than .1 will report that the treatment effect is null. Nonetheless, also make sure to interpret the substance and magnitude of the treatment effect, and avoid focusing solely on statistical significance.
+4. Type I error is when you reject the null hypothesis when it is actually true. In other words, you conclude that the treatment did have an effect, when in reality, it did not. The significance level can also be interpreted as the probability that we are committing Type I error. (Type II error is when you accept the null hypothesis when it is actually false, in other words, you conclude a null effect when one actually existed.)
+5. Randomization inference enables us to calculate what the observed treatment effect would have been in every possible randomization of the experiment if we hypothesize that no subject responded to the treatment (our null hypothesis). From this, we can calculate the probability that we would have observed our treatment effect if the true treatment effect was actually zero. If this is a very low probability, then we have more confidence in the significance of our findings from the single randomization we actually observed.
+

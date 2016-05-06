@@ -1,0 +1,162 @@
+---
+title: "Key Tools for Experimental Research Design and Analysis in R"
+subtitle: "EGAP Experiments Workshop"
+author: "Santiago, Chile - May, 2016"
+date: "Day 3: Power Analysis and Estimation of the Treatment Effects"
+output: pdf_document
+---
+
+#Today: First Steps in Causal inference using R. 
+
+* Power Analysis
+    + Simple power analysis
+    + Power analysis for clustered randomization
+    + Assignment
+* Estimation of the effects
+     + Simulation
+     + Assigning treatment
+     + Estimating a treatment effect
+
+
+#1. Power Analysis
+
+\begin{framed}
+This section comes from these two very useful pages from the EGAP website: \href{http://egap.org/methods-guides/10-things-you-need-know-about-statistical-power}{``10 Things You Need to Know About Statistical Power''} and \href{http://egap.org/content/power-analysis-simulations-r}{``Power Analysis Simulations in R''}. 
+\end{framed}
+
+**What is power?**
+
+Supposing there truly is a treatment effect and you were to run your experiment a huge number of times, how often will you get a statistically significant result? 
+
+Answering this question requires informed guesswork. You'll have to supply guesses as to how big your treatment effect can reasonably be, how many subjects will answer your survey, how many subjects your organization can realistically afford to treat.
+
+Where do these guesses come from? Before an experiment is run, there is often a wealth of baseline data that are available. How old/rich/educated are subjects like yours going to be? How big was the biggest treatment effect ever established for your dependent variable? With power analysis, you can see how sensitive the probability of getting significant results is to changes in your assumptions.
+
+Many disciplines have settled on a target power value of 0.80. Researchers will tweak their designs and assumptions until they can be confident that their experiments will return statistically significant results 80\% of the time. While this convention is a useful benchmark, be sure that you are comfortable with the risks associated with an 80\% expected success rate
+Below we show a very simple power analysis:
+
+
+##1.a Simple Power Analysis
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+
+possible.ns <- seq(from=100, to=2000, by=50) # The sample sizes we'll be considering
+powers <- rep(NA, length(possible.ns))       # Empty object to collect simulation estimates
+alpha <- 0.05                                # Standard significance level
+sims <- 500                                  # Number of simulations to conduct for each N
+
+#### Outer loop to vary the number of subjects ####
+for (j in 1:length(possible.ns)){
+  N <- possible.ns[j]                        # Pick the jth value for N
+  
+  significant.experiments <- rep(NA, sims)   # Empty object to count significant experiments
+  
+  #### Inner loop to conduct experiments "sims" times over for each N ####
+  for (i in 1:sims){
+    Y0 <-  rnorm(n=N, mean=60, sd=20)              # control potential outcome
+    tau <- 5                                       # Hypothesize treatment effect
+    Y1 <- Y0 + tau                                 # treatment potential outcome
+    Z.sim <- rbinom(n=N, size=1, prob=.5)          # Do a random assignment
+    Y.sim <- Y1*Z.sim + Y0*(1-Z.sim)               # Reveal outcomes according to assignment
+    fit.sim <- lm(Y.sim ~ Z.sim)                   # Do analysis (Simple regression)
+    p.value <- summary(fit.sim)$coefficients[2,4]  # Extract p-values
+    significant.experiments[i] <- (p.value <= alpha) # Determine significance according to 
+                                                     #p <= 0.05
+  }
+  
+  powers[j] <- mean(significant.experiments) # store average success rate (power) for each N
+}
+plot(possible.ns, powers, ylim=c(0,1))
+
+```
+
+##1.b Power analysis for clustered randomization
+
+
+##1.c Assignment
+
+Try to replicate the graph in section 1.a, but instead of varying the size of your sample, calculate your power for:
++ Different levels of noise
++ Different effect sizes
+
+#2. Estimation of the effects
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+
+# Clear R's memory
+rm(list = ls())                        
+
+# Set the seed to make replication possible. Use today's date (20 April 2015).
+set.seed(20150420)                     
+
+# 2. Analysis using simulated data
+##############################################################################
+# Now lets simulate a dataset of size n
+
+# Number of people in the study
+n  <- 10                          
+
+# The average treatment effect (we are fixing the avg treatment effect at 1) 
+effect <- 1                       
+
+# Randomly generate people's test scores if they are not treated
+Y0 <- rnorm(n)                     
+
+# Randomly generate people's test scores if they are treated
+Y1 <- Y0 + effect + rnorm(n)       
+
+# Complete random assignment of half of the people to treatment
+X  <- sample(0:1, n, replace = TRUE) 
+
+# Use treatment to "reveal" Y1 or Y0
+Y  <- Y0*(1-X) + Y1*X  
+
+# Investigate your dataset (first)
+data <- data.frame(Y0, Y1,  X, Y)
+#View(data)
+summary(data)
+
+# We can plot the treatment and control outcomes for each individual
+par(mfrow=c(1,1))
+plot(1:n, Y1, xlab = "unit", ylab= "Potential Outcomes")
+points(1:n, Y0, col = "red")
+arrows(1:n, Y0, 1:n, Y1, col = ifelse(Y0<Y1, "red", "black"))
+
+# We are now ready for estimation
+# Calculate the average observed score among control
+av.cntrl <- mean(Y[X==0]) 
+av.cntrl
+
+# Calculate the average observed score among treated 
+av.treat <- mean(Y[X==1]) 
+av.treat
+
+# Calculate the average treatment effect
+est.effect <- av.treat-av.cntrl       
+est.effect
+
+# Calculate the average treatment effect using regression
+summary(lm(Y ~ X))    
+
+# How close is this to the true effect?
+mean(Y1-Y0)
+
+# Let's check if the estimate is unbiased. To do this we figure out
+# what we would estimate under many possible random assignments
+
+new.estimate = function(Y0, Y1, X){
+  # Enter data for Y0, Y1 and X, the function rerandomizes and generates an estimate
+  # of average treatment effects given the new randomization
+  x.new <- sample(X)
+  y.new <- Y1*x.new + Y0*(1-x.new)
+  est   <-  mean(y.new[x.new==1]) -   mean(y.new[x.new==0])
+  return(est)
+}
+
+sims <- sapply(1:1000, function(i) new.estimate(Y0, Y1, X))
+hist(sims)
+# You should see that the estimate we get depends a lot on how the randomization
+# works out. Sometimes it will be too high, sometimes too low, but it should be 
+# right on average
+
+```

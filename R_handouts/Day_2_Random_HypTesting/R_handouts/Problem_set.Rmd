@@ -1,0 +1,481 @@
+---
+title: "Key Tools for Experimental Research Design and Analysis in R"
+subtitle: "EGAP Experiments Workshop"
+author: "Santiago, Chile - May, 2016"
+header-includes:
+   - \usepackage{booktabs}
+   - \usepackage{multirow}  
+   - \usepackage{tabularx}
+   - \usepackage{framed}
+date: "Day 2: Hypotheses Testing and Randomization"
+output: pdf_document             
+---
+
+
+##Question 1
+
+A researcher plans to ask six participants to contribute time teaching an adult literacy program. Each participant will be asked to donate either 30 or 60 minutes. The researcher is considering three methods for randomizing the treatment. 
+
++ One method is to flip a coin before talking to each participant and to ask for a 30-minute donation if the coin comes up heads or a 60-minute donation if it comes up tails. 
++ The second method is to write "30"" on three playing cards and "60"" on three other, and then shuffle cards. The first participant would be assigned the number on the first card, the second participant would be assigned the number on the second card, and so on. 
++ A third method is to write "30" and "60"" each on three different slips of paper, seal the slips into an envelope, and shuffle the six envelopes before talking to the first subject. The first subject would be assigned the first envelope, the second subject would be assigned the second envelope, and so on.
+
+
+	1.  Discuss the strengths and weakness of each approach.
+	
+	\vspace{3mm}
+	\vspace{3mm}
+	\vspace{3mm}
+	\vspace{3mm}
+	\vspace{3mm}
+	\vspace{3mm}
+	
+	2. In what ways would your answer to (a) change if the number of subjects were 600 instead of 6?
+	
+	\vspace{3mm}
+	\vspace{3mm}
+	\vspace{3mm}
+	\vspace{3mm}
+	\vspace{3mm}
+	
+	3.  What is the expected value of the assigned number of minutes if the coin toss method is used? What is the expected value of the assigned number of minutes if the sealed envelope method is used?
+	
+	\vspace{3mm}
+	\vspace{3mm}
+	\vspace{3mm}
+	\vspace{3mm}
+	\vspace{3mm}
+	
+Source: Gerber, Alan S.; Green, Donald P.. 2012. Field Experiments: Design, Analysis, and Interpretation. Norton, p. 47.
+
+##Question 2
+
+You have been hired by the government to work on a field experiment in schools and look at the effect of providing new teaching material on student performance. The project will provide new textbooks and writing materials to 100 primary schools across the country. You have been provided a data set of 200 eligible schools in five districts. A snapshot of the data set looks as follows:
+
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{rrrrrrrr}
+		\toprule
+		\multirow{2}[0]{*}{Region ID} &
+		\multirow{2}[0]{*}{District ID} &
+		\multirow{2}[0]{*}{County ID} &
+		\multicolumn{2}{r}{\multirow{2}[0]{*}{School ID}} &
+		\multirow{2}[0]{*}{Classroom ID} &
+		\multirow{2}[0]{*}{Student ID} &
+		\multirow{2}[0]{*}{Baseline Test Score}
+		\\
+		\midrule
+		\multicolumn{1}{c}{1} &
+		\multicolumn{1}{c}{4} &
+		\multicolumn{2}{c}{2} &
+		\multicolumn{1}{c}{16} &
+		\multicolumn{1}{c}{13} &
+		\multicolumn{1}{c}{1} &
+		\multicolumn{1}{c}{88}
+		\\
+		\multicolumn{1}{c}{1} &
+		\multicolumn{1}{c}{4} &
+		\multicolumn{2}{c}{2} &
+		\multicolumn{1}{c}{16} &
+		\multicolumn{1}{c}{13} &
+		\multicolumn{1}{c}{2} &
+		\multicolumn{1}{c}{56}
+		\\
+		\multicolumn{1}{c}{1} &
+		\multicolumn{1}{c}{4} &
+		\multicolumn{2}{c}{2} &
+		\multicolumn{1}{c}{16} &
+		\multicolumn{1}{c}{13} &
+		\multicolumn{1}{c}{3} &
+		\multicolumn{1}{c}{98}
+		\\
+		\multicolumn{1}{c}{1} &
+		\multicolumn{1}{c}{4} &
+		\multicolumn{2}{c}{2} &
+		\multicolumn{1}{c}{16} &
+		\multicolumn{1}{c}{14} &
+		\multicolumn{1}{c}{1} &
+		\multicolumn{1}{c}{76}
+		\\
+		\multicolumn{1}{c}{1} &
+		\multicolumn{1}{c}{4} &
+		\multicolumn{2}{c}{2} &
+		\multicolumn{1}{c}{16} &
+		\multicolumn{1}{c}{14} &
+		\multicolumn{1}{c}{2} &
+		\multicolumn{1}{c}{82}
+		\\
+		\multicolumn{1}{c}{1} &
+		\multicolumn{1}{c}{4} &
+		\multicolumn{2}{c}{6} &
+		\multicolumn{1}{c}{18} &
+		\multicolumn{1}{c}{7} &
+		\multicolumn{1}{c}{1} &
+		\multicolumn{1}{c}{87}
+		\\
+		\multicolumn{1}{c}{1} &
+		\multicolumn{1}{c}{4} &
+		\multicolumn{2}{c}{6} &
+		\multicolumn{1}{c}{18} &
+		\multicolumn{1}{c}{7} &
+		\multicolumn{1}{c}{2} &
+		\multicolumn{1}{c}{68}
+		\\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+
+	1.  Think about randomizing treatment (new materials) at each of the levels in the table below. For each level of randomization fill in what your counterfactual (control group) is. In the third column, list potential spillover effects that may cause a bias in your estimated treatment effect. 
+	
+	\begin{framed}
+		\textbf{Hint:} If randomization is at the "Student" level, this means that you randomize students who receive materials and students who don't receive materials. If randomization is at the "Classroom" level, you randomly select classrooms that will receive treatment, and all students in that classroom will receive the materials.
+	\end{framed}
+	
+	\begin{table}[h!]
+		\centering
+		\begin{tabular}{|p{8cm}|m{4cm}|m{4cm}|}
+			\toprule
+			Randomization & Control Group     & Spillover         \\ \midrule
+			\multirow{4}{8cm}{1. Student}                                                                                                                                                    & \multirow{4}{*}{} & \multirow{4}{*}{} \\
+			&                   &                   \\
+			&                   &                   \\
+			&                   &                   \\ \midrule
+			\multirow{4}{8cm}{2. Classroom}                                                                                                                                                  & \multirow{4}{*}{} & \multirow{4}{*}{} \\
+			&                   &                   \\
+			&                   &                   \\
+			&                   &                   \\ \midrule
+			\multirow{6}{8cm}{3. School (All classrooms in school receive materials)}                                                                                                        & \multirow{6}{*}{} & \multirow{6}{*}{} \\
+			&                   &                   \\
+			&                   &                   \\
+			&                   &                   \\ \midrule
+			\multirow{6}{8cm}{4. School \textgreater Classroom A 2 step randomization process: 100 schools are randomly selected and in each of those 100, 1 classroom is randomly selected} & \multirow{6}{*}{} & \multirow{6}{*}{} \\
+			&                   &                   \\
+			&                   &                   \\
+			&                   &                   \\
+			&                   &                   \\			
+			&                   &                   \\ \bottomrule
+		\end{tabular}
+	\end{table}
+	
+
+##Question 3
+
+You have just been hired to work on a field experiment  The data you will be using comes from the Pratham Balsakhi program in Vadodara India and is available at \url{http://runningres.com/exercises}. The variable “town” has been added for the purposes of this assignment and is not original to the data set.
+
+To load the data set, find it at: \begin{verbatim}experiment\assignments\randomize.csv\end{verbatim}
+Make sure to set your working directory to the appropriate folder in R and use the read.csv command to load the data set into R. 
+
+  1.	Before we begin randomizing, let's get some basic information about the data set. Fill in the table below:
+	
+	\begin{table}[h!]
+		\centering
+		\begin{tabular}{lcc}
+			\toprule
+			&
+			\multicolumn{2}{c}{Number of Schools}
+			\\
+			\midrule
+			\multicolumn{3}{l}{Gender}
+			\\
+			\midrule  
+			\multicolumn{1}{l}{Kanya} &
+			\multicolumn{2}{c}{}
+			\\
+			\multicolumn{1}{l}{Kumar} &
+			\multicolumn{2}{c}{}
+			\\
+			\multicolumn{1}{l}{Mishra} &
+			\multicolumn{2}{c}{}
+			\\
+			\midrule
+			\multicolumn{3}{l}{Language}
+			\\
+			\midrule
+			\multicolumn{1}{l}{Gujarati} &
+			\multicolumn{2}{c}{}
+			\\
+			\multicolumn{1}{l}{Hindi} &
+			\multicolumn{2}{c}{}
+			\\
+			\multicolumn{1}{l}{Marathi} &
+			\multicolumn{2}{c}{}
+			\\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+	
+	Based on the table above, what are some considerations you need to keep in mind when you are determining which randomization approach to use?
+	
+	
+  2.	Your first task is to randomize treatment assignment at the school level for the 124 schools, where each school has a 50/50 chance of being assigned to treatment (i.e. simple randomization) 
+	
+	Fill in the tables below with the number of schools for each characteristic 
+	
+	\begin{table}[h!]
+		\centering
+		\begin{tabular}{lrrr}
+			\toprule
+			&
+			Kanya &
+			Kumar &
+			Mishra
+			\\
+			\midrule
+			Control &
+			&
+			&
+			
+			\\
+			Treatment &
+			&
+			&
+			
+			\\
+			\bottomrule
+		\end{tabular}%
+	\end{table}%
+	
+	\begin{table}[h!]
+		\centering
+		\begin{tabular}{lrrr}
+			\toprule
+			&
+			Gujarati &
+			Hindi &
+			Marathi
+			\\
+			\midrule
+			Control &
+			&
+			&
+			
+			\\
+			Treatment &
+			&
+			&
+			
+			\\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+	
+  3. Re-randomize treatment assignment, again at the school level using the same method.
+	Fill in the table below. 
+	
+	\begin{table}[h!]
+		\centering
+		\begin{tabular}{lrrr}
+			\toprule
+			&
+			Kanya &
+			Kumar &
+			Mishra
+			\\
+			\midrule
+			Control &
+			&
+			&
+			
+			\\
+			Treatment &
+			&
+			&
+			
+			\\
+			\bottomrule
+		\end{tabular}%
+	\end{table}%
+	
+	\begin{table}[h!]
+		\centering
+		\begin{tabular}{lrrr}
+			\toprule
+			&
+			Gujarati &
+			Hindi &
+			Marathi
+			\\
+			\midrule
+			Control &
+			&
+			&
+			
+			\\
+			Treatment &
+			&
+			&
+			
+			\\
+			\bottomrule
+		\end{tabular}
+	\end{table}		
+	
+  4.	Do the tables in (b) and (c) have all the same values? Why or why not? 
+	
+	\vspace{3mm}
+	\vspace{3mm}
+	\vspace{3mm}
+	\vspace{3mm}
+	
+	
+
+  5. Now suppose that the team you are working with want to block randomize on gender.  There are three gender categories in this experiment: kanya (girls only), kumar (boys only), and mishra (co-ed). 
+	
+	\begin{table}[h!]
+		\centering
+		\begin{tabular}{lrrrr}
+			\toprule
+			&
+			Total &
+			Kanya &
+			Kumar &
+			Mishra
+			\\
+			\midrule
+			Control &
+			&
+			&
+			&
+			
+			\\
+			Treatment &
+			&
+			&
+			&
+			
+			\\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+	
+	
+	6. Now suppose that the team you are working with want to block randomize on gender.  There are three gender categories in this experiment: kanya (girls only), kumar (boys only), and mishra (co-ed). 
+	
+	\begin{table}[h!]
+		\centering
+		\begin{tabular}{lrrrr}
+			\toprule
+			&
+			Total &
+			Kanya &
+			Kumar &
+			Mishra
+			\\
+			\midrule
+			Control &
+			&
+			&
+			&
+			
+			\\
+			Treatment &
+			&
+			&
+			&
+			
+			\\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+	
+	7.	How do your tables in (e) and (f) compare to your result tables in in (b) and (c) when you change the seed? Why is this the case?
+	
+	\vspace{3mm}
+	\vspace{3mm}
+	\vspace{3mm}
+	\vspace{3mm}
+	\vspace{3mm}
+	\vspace{3mm}
+	
+	8.	For the four randomization processes you ran in questions (b) – (f), fill in the questions below:
+	
+	\begin{table}[h!]
+		\centering
+		\begin{tabular}{l|m{2cm}m{2cm}m{2cm}m{2cm}m{2cm}}
+			\toprule
+			Treatment Assignment Percentage &
+			0\% &
+			25\% &
+			50\% &
+			75\% &
+			100\%
+			\\
+			\midrule
+			\multirow{2}[2]{*}{Number of Schools} &
+			\multirow{2}[2]{*}{} &
+			\multirow{2}[2]{*}{} &
+			\multirow{2}[2]{*}{} &
+			\multirow{2}[2]{*}{} &
+			\multirow{2}[2]{*}{}
+			\\
+			&
+			&
+			&
+			&
+			&
+			
+			\\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+	
+	
+	What is the probability of treatment assignment across units?\_\_\_\_\_\_\_\_\_
+	
+	
+	9.	You realize that schools in the same town are situated close to one another, and you are concerned about spillover effects. You decide to do a cluster randomization so that all schools in the same town are treated. You first attempt this by doing a simple randomization.
+	
+  + How many towns were selected for the treatment group? \_\_\_\_\_\_\_\_\_
+  + What proportion of total number of towns is the treatment group? \_\_\_\_\_\_\_\_
+	
+	10.	You decide instead to randomly select 13 towns for treatment and the remaining 12 towns are assigned to control. (i.e. complete cluster randomization)
+	
+	+ How many towns were selected for the treatment group? \_\_\_\_\_\_\_
+	+ What proportion of total number of towns is the treatment group? \_\_\_\_\_\_
+	
+	11. 	The team decides that the nature of the treatment makes the concern about spillovers inapplicable, so treatment can be assigned at the school level. However budget constraints mean that there is enough funding to treat only 40 schools. You are tasked with randomly selecting 40 treated schools.)
+	
+	Fill in the table below:
+	
+	\begin{table}[h!]
+		\centering
+		\begin{tabular}{lrrrr}
+			\toprule
+			&
+			Total &
+			Kanya &
+			Kumar &
+			Mishra
+			\\
+			\midrule
+			\multirow{2}[2]{*}{Control} &
+			\multirow{2}[2]{*}{} &
+			\multirow{2}[2]{*}{} &
+			\multirow{2}[2]{*}{} &
+			\multirow{2}[2]{*}{}
+			\\
+			&
+			&
+			&
+			&
+			
+			\\
+			\multirow{2}[2]{*}{Treatment} &
+			\multirow{2}[2]{*}{} &
+			\multirow{2}[2]{*}{} &
+			\multirow{2}[2]{*}{} &
+			\multirow{2}[2]{*}{}
+			\\
+			&
+			&
+			&
+			&
+			
+			\\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+	
+Data source: Glennerster, Rachel; Takavarasha, Kudzai. 2013. Running Randomized Evaluations: A Practical Guide. Princeton, module 4.4. Online resources at \url{http://runningres.com.}
+

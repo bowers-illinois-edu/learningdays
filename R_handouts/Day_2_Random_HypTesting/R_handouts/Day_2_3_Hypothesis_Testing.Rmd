@@ -1,0 +1,396 @@
+---
+title: "Key Tools for Experimental Research Design and Analysis in R"
+subtitle: "EGAP Experiments Workshop"
+author: "Santiago, Chile - May, 2016"
+header-includes:
+   - \usepackage{booktabs}
+   - \usepackage{multirow}  
+   - \usepackage{tabularx}
+   - \usepackage{framed}
+   - \usepackage{float}
+date: "Day 2: Hypotheses Testing and Randomization"
+output: pdf_document
+---
+
+
+#Today
+
+First Steps in Causal inference using R:
+
+* Review: Simple statistics
+     + Vectors
+     + Key statistics
+     + Sampling From Distributions
+     + The Central Limit Theorem
+* Randomization
+     + Randomization strategies
+     + Problem set
+* **Hypothesis Testing**
+     + **Parametric hypothesis testing**
+     + **Randomization Inference**
+     + **Problem set**
+     
+
+#3. Hypothesis Testing
+
+We are going to use the same data created for the Randomization handout. For the purpose of the following exercise, we will assume complete randomization. 
+
+##Parametric and non-parametric tests
+
+```{r,echo=FALSE,warning=FALSE,message=FALSE}
+
+# We need 
+rm(list = ls())
+set.seed(12345)
+
+villages <- c("vill 01","vill 02","vill 03","vill 04","vill 05",
+              "vill 06","vill 07","vill 08","vill 09","vill 10")
+
+samples <- c(60,60,60,60,60,
+             60,60,60,60,60)
+
+N <- sum(samples)
+ID <- 1:N
+
+village <- rep(x = villages, times = samples) 
+
+female <- rep(c(rep(1,30),rep(0,30)),10)
+days.sick.no.device <- rnbinom(n = N,mu = 10,size = 1) + 7
+
+outbreak.effect <- 5
+outbreak.villages <- sample(x = villages,size = 3)
+Y0 <- ifelse(test = village %in% outbreak.villages,
+             yes = days.sick.no.device + outbreak.effect,
+             no = days.sick.no.device + 0)
+
+effect.male <- -2
+effect.female <- -7
+Y1 <- ifelse(test = female == 1,yes = Y0 + effect.female, no = Y0 + effect.male)
+
+data <- data.frame(
+     ID = ID,
+     village = village,
+     female = female,
+     Y0 = Y0,
+     Y1 = Y1
+)
+
+complete.ra <- c(rep(1,200),
+                 rep(0,N-200))
+
+set.seed(12345)
+
+complete.ra <- sample(complete.ra)
+
+data$complete.ra <- complete.ra
+
+data$complete.obs <- with(data,Y1*complete.ra+Y0*(1-complete.ra))
+
+```
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60),warning=FALSE, message=FALSE}
+
+# Hypothesis testing 
+##########################################################################
+
+# We want to explore if providing devices does reduce the average number 
+# of days in the year that the person was sick. To do this, we want to test whether
+# the average number of days is higher for the control group than it is for the 
+# treatment group. 
+
+# Using the complete randomization vector, we first need to calculate the average 
+# in each group for our experiment: 
+# Notice that now we will need the observed data: 
+
+av.treat <- mean(data$complete.obs[data$complete.ra==1]) 
+av.control <- mean(data$complete.obs[data$complete.ra==0]) 
+diff.mean<- av.treat-av.control 
+
+# How do we set up a test in this context? 
+# 1. Notice that if our treatment had not effect, then both averages should be 
+# the same. Therefore, our null hypothesis (H0) should be that the difference 
+# between these two means is equal to zero.  
+
+# NOTE: In particular, we want to know what is the probability to get 
+# a difference of means as extreme as the one we observe in the data
+# (perhaps in absolute terms) if the null hypothesis is true, *the p-value*.
+
+# We will do this in two ways: using a t-test and using randomization inference
+# Remember these tests pose different NULL HYPOTHESIS.
+
+# a. T-test 
+##############################################################
+
+# H0: Mean(# of days for treated) - Mean(# of days for control) = 0
+
+# We create a vector with the treated individuals:
+treated <- data$complete.obs[data$complete.ra==1]
+treated
+
+# And then calculate their variance 
+var1 <- sum((treated - mean(treated))^2) / (length(treated) - 1)
+var1
+
+# And we do the same with units in the control group:
+not_treated <- data$complete.obs[data$complete.ra==0]
+not_treated
+
+var0 <- sum((not_treated - mean(not_treated))^2) / (length(not_treated) - 1)
+var0
+
+# and with this we can estimate the SE of the difference of means 
+# (which we'll get back to tomorrow)
+
+estimated_se <- sqrt(var1/length(treated) + var0/length(not_treated))
+estimated_se
+
+# We estimate our t-statistic by converting to standard units:
+t_stat <- ((av.treat-av.control) - 0) / estimated_se
+t_stat
+
+# To be able to get the right Student t Distribution, we need to calculate
+# the degrees of freedom (Satterthwaite)
+df <- (var1/length(treated) + var0/length(not_treated))^2 / 
+           ((var1/length(treated))^2 / (length(treated) - 1) + 
+           (var0/length(not_treated))^2 / (length(not_treated) - 1))
+df
+
+# Where does our t statistic fall with respect to the student t distribution? 
+# Install ggplot2 if you don't have it. This is a nice package to make plots. 
+
+library(ggplot2)
+
+# Generate the sequence of different values of x
+x <- seq(-5, 5, len = 100)
+# Placeholder plot
+p <- qplot(x, geom = "blank") 
+# Plot student t distribution with the parameters just estimated: 
+# i)  df= degrees of freedom (df)
+# ii) ncp = non centrality parameter. We want it to be 0. 
+stat <- stat_function(fun=dt, args=list(df=df, ncp=0), col="black", size=1)
+# We add this distribution to placeholder plot and the estimated diff in means: 
+p + stat + geom_vline(xintercept = t_stat, col="red") 
+
+# Now we want the p-value. For that we will use the CDF of the distribution
+?pt # to understand better what we are doing
+
+# Now, do we want to perform a one tailed or two tailed test?
+
+# One tailed p-value: the distribution is centered in 0 and t_stat<0. 
+# This means that we are looking for the probability that we see 
+# a t-stat at least as SMALL (in our case) as this one (lower tail).
+
+# Two tailed p-value: here we would need the same number plus the probability that 
+# we see a t-stat greater or equal to:
+-t_stat
+
+# First, let's see what's the probability of observing a t-statistic as small
+# as the one we see: 
+pt(t_stat, df=df, ncp=0, lower.tail=TRUE)
+# Now, we need this probability plus the prob in the upper tail. We can do this
+# in one single line of code: 
+2 * pt(abs(t_stat), df, lower.tail=F)
+
+# We can also do this using the build-in R function called t.test:
+t.test(treated, not_treated, alternative="less") # one tail 
+t.test(treated, not_treated, alternative="two.sided") # two tail
+
+# Another way: we can also estimate this using a regression but we need to 
+# correct our standard errors to account for the possibility
+# of different variances between treatment and control groups.
+lm(complete.obs~complete.ra, data=data)
+
+# b. Randomization inference 
+######################################################
+
+# Recall that the SHARP null hypothesis in RI is: 
+# H0: y_i(1) - y_i(0) = 0 for ALL units
+
+# The sharp null allows us to "see" the full schedule of potential outcomes. 
+# Thus, we can generate a distribution of the estimated difference of means
+# we would have seen over replications of the experiment if the null is TRUE. 
+
+# In general there are two options to do this. 
+# 1) We produce a matrix of all possible treatment vectors by permuting  
+#    the number of treatedand total number of observations.
+# 2) If the actual number of permutations is too big, we can instead replicate treatment
+#    assignment a large number of times (e.g., 10,000 times) 
+
+
+# Because if the true parmutation matrix is too large,  
+choose(600,400)
+# we use method 2): We replicate treatment assignment 10,000 and only
+# keep unique vectors:
+perm_matrix <- matrix(NA, 10000, 600)
+for (i in 1:10000){
+perm_matrix[i,] <- sample(data$complete.ra, 600, replace=F)
+}
+perm_matrix<-unique(perm_matrix)
+
+# We now estimate the difference in means for each possible randomization. 
+
+# We can use a loop for doing this: 
+rand_ate <- NA # placeholder vector for results
+for (i in 1:nrow(perm_matrix)){ # for each one of the "fake" treatment vectors
+
+  mean_treat <- mean(data$complete.obs[perm_matrix[i,]==1])
+  
+  mean_control <- mean(data$complete.obs[perm_matrix[i,]==0])
+  
+  # calculating difference of means for this randomization
+  rand_ate[i] <- mean_treat - mean_control
+  
+}
+
+summary(rand_ate) # vector of permutation of differences. 
+
+# We can make a plot to better see the results:
+
+hist(rand_ate, breaks=50, 
+     main="Permutation distribution",
+     xlab= "Value of test statistic",
+     ylab = "Freq.", xlim=c(-5,5))
+abline(v=diff.mean, lwd=3, col="slateblue")
+
+
+# How do we calculate the p-values in this context?
+
+# One tailed
+sum(rand_ate<=diff.mean)/length(rand_ate)
+
+# Two tailed
+sum(abs(rand_ate)<=diff.mean)/length(rand_ate)
+
+```
+
+##3.b.Problem set 
+
+###Question 1
+
+Imagine that you are still working on the project in India that runs an intervention in India with 124 schools, the same data set that you worked with in the Randomization Assignment. After randomization an intervention was implemented in which treatment schools were partnered with local teacher colleges to have student teachers providing assistance in classrooms for 6 weeks. At the end of the six weeks data was collected on student test scores, and your task now is to begin the analyses of the data. Use the "hypothesis.csv" data file found in the Assignments folder.
+
+There is a treatment variable (called treat), where $1 =$ intervention received (treatment) and $2 =$ no intervention received (control). Our "Y" variable, or outcome variable, is called `testscore`.
+
+  1. Ultimately, you want to test the a sharp null hypothesis (i.e. that there is no treatment effect). Write out first in formal notation the null hypothesis and the alternative hypothesis below.  Use Y1 to denote the treatment group and Y0 to denote the control group.
+  
+  + $H_0$ 
+
+\vspace{3mm}
+
+  + $H_a$ 
+
+\vspace{3mm}
+	
+  2. Now write out in full sentences what the above notation means, referring to the project described above where the outcome variable of interest is test scores and the intervention is additional teacher support (assistance from student teachers) in treatment school classrooms.
+  
+  + $H_0$ 
+
+\vspace{3mm}
+
++ $H_a$ 
+
+\vspace{3mm}
+  
+  3. Fill in the table below with the mean and standard deviations for the whole sample, the treatment group, and the control group.
+	
+	\begin{table}[H]
+		\centering
+		\begin{tabular}{|r|c|c|c|}
+			\toprule
+			&
+			Whole Sample &
+			Treatment &
+			Control
+			\\
+			\midrule
+			Mean &
+			\textit{} &
+			\textit{} &
+			\textit{}
+			\\
+			\hline
+			Standard Deviation &
+			\textit{} &
+			\textit{} &
+			\textit{}
+			\\
+			\bottomrule
+		\end{tabular}
+	\end{table}            
+	
+  4. Using the above table, what is the estimated treatment effect?
+	
+	\vspace{3mm}
+	\vspace{3mm}
+	\vspace{3mm}
+	\vspace{3mm}
+	\vspace{3mm}
+	
+  5. Run the hypothesis test code (under Question 1d in the R script) and fill in the table below. 
+	
+	\begin{table}[H]
+		\centering
+		\begin{tabular}{|c|c|c|}
+			\toprule
+			Estimated Treatment Effect &
+			Null Hypothesis Treatment Effect &
+			p-value
+			\\
+			\midrule
+			\multicolumn{1}{|c|}{\multirow{3}[2]{*}{}} &
+			\multicolumn{1}{c|}{\multirow{3}[2]{*}{}} &
+			\multicolumn{1}{c|}{\multirow{3}[2]{*}{}}
+			\\
+			\multicolumn{1}{|c|}{} &
+			\multicolumn{1}{c|}{} &
+			\multicolumn{1}{c|}{}
+			\\
+			\multicolumn{1}{|c|}{} &
+			\multicolumn{1}{c|}{} &
+			\multicolumn{1}{c|}{}
+			\\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+	
+	
+  6. What can you conclude about the teacher support intervention from these results?
+	
+  + At the 0.1 significance level 
+  \vspace{3mm}
+  \vspace{3mm}
+  \vspace{3mm}
+  \vspace{3mm}
+  
+  + At the 0.05 significance level? 
+  \vspace{3mm}
+  \vspace{3mm}
+  \vspace{3mm}
+  \vspace{3mm}
+  
+  + At the 0.01 significance level? 
+  \vspace{3mm}
+  \vspace{3mm}
+  \vspace{3mm}
+  \vspace{3mm}
+		
+  7. Based on your results, would you suggest to the government that they should scale up this project to the whole country? Why or why not? 
+	
+  \vspace{3mm}
+	\vspace{3mm}
+	\vspace{3mm}
+	\vspace{3mm}
+	\vspace{3mm}
+	\vspace{3mm}
+	\vspace{3mm}
+	\vspace{3mm}
+	
+
+##Main Points to Remember About Hypothesis Testing
+
+1. Hypothesis testing is a calculation of the probability that we can reject stated hypotheses about our treatment effect. This provides us with a means of characterizing our certainty that an estimated treatment effect approximates the true treatment effect.
+2. The most common hypothesis that we test is the sharp null hypothesis, which states that the treatment had absolutely no effect on any individual unit. To test this hypothesis, we calculate the probability that we could have observed the treatment effect we did if the treatment in reality had no effect whatsoever. This probability is known as a p-value. For example, a p-value of .05 is interpreted as a 5\% chance that we could observe a treatment effect at least as large as the one we found if the treatment in fact had no effect.
+3. It is conventional that p-values of .05 or lower are "significant". This is an arbitrary cutoff, but it is so widely used in statistics that any study that fails to recover a p-value of less than .1 will report that the treatment effect is null. Nonetheless, also make sure to interpret the substance and magnitude of the treatment effect, and avoid focusing solely on statistical significance.
+4. Type I error is when you reject the null hypothesis when it is actually true. In other words, you conclude that the treatment did have an effect, when in reality, it did not. The significance level can also be interpreted as the probability that we are committing Type I error. (Type II error is when you accept the null hypothesis when it is actually false, in other words, you conclude a null effect when one actually existed.)
+5. Randomization inference enables us to calculate what the observed treatment effect would have been in every possible randomization of the experiment if we hypothesize that no subject responded to the treatment (our null hypothesis). From this, we can calculate the probability that we would have observed our treatment effect if the true treatment effect was actually zero. If this is a very low probability, then we have more confidence in the significance of our findings from the single randomization we actually observed.
+
