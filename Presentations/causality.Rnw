@@ -95,6 +95,35 @@ opts_chunk$set(tidy=FALSE,echo=FALSE,results='markup',fig.path='figs/fig',cache=
 
 \end{frame}
 
+\section{Why randomize?}
+
+\begin{frame}
+	\frametitle{Observational studies vs. Randomized studies}
+
+	\textbf{Discuss in small groups:}  Help me design the next project to
+	answer this question (or one of your own causal questions):
+
+	\smallskip
+
+	Did \href{https://youtu.be/RgYIGLNdy9I}{a new Hausa television station} in northern Nigeria change
+	attitudes about violence, the role of women in society, or the role
+	of youth in society?
+
+	\begin{enumerate}	
+
+		\item What would be an ideal observational study design? (no randomization)
+	What questions would people ask when you claim that your results reflect a
+	causal relationship?
+
+\item What would be an ideal experimental study design? (including
+	randomization)  What questions would people ask when you claim that your
+	results reflect a causal relationship?
+\end{enumerate}
+
+\end{frame}
+
+
+
 \section{Overview of Statistical Inference for Causal Quantities}
 
 \begin{frame}
@@ -102,6 +131,9 @@ opts_chunk$set(tidy=FALSE,echo=FALSE,results='markup',fig.path='figs/fig',cache=
 
 	How can we use what we \textbf{see} to learn about \only<1>{what we want to
 		\textbf{know}} \only<2->{\textbf{potential outcomes}}?
+
+	The effect of treatment can be defined in different ways using
+	potential outcomes (leaving it vague for now).
 
 <<readdata, echo=FALSE>>=
 newsdf <- read.csv("../Data/news.csv")
