@@ -11,5 +11,6 @@ git submodule update
 
 ## File Formats
 
-Some files are in Rmarkdown (.Rmd) or markdown (.md) formats. You can edit them using any plain text editor. For example, RStudio has a built in text editor. [more text editor suggestions]
+Some files are in [Rmarkdown (.Rmd)](http://rmarkdown.rstudio.com/index.html) or markdown (.md) formats. You can edit them using any plain text editor. For example, RStudio has a built in text editor. [more text editor suggestions]
 
+If you want to turn Rmarkdown files into pdf files, you will probably want to install latex (for example, for Mac try <https://tug.org/mactex/> on Windows <http://miktex.org/> or <https://www.tug.org/texlive/windows.html>, for Linux <https://www.tug.org/texlive/> ).
