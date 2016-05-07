@@ -1,17 +1,20 @@
 ---
 title: "Key Tools for Experimental Research Design and Analysis in R"
-subtitle: "EGAP Experiments Workshop"
 author: "Santiago, Chile - May, 2016"
-header-includes:
-   - \usepackage{booktabs}
-   - \usepackage{multirow}  
-   - \usepackage{tabularx}
-   - \usepackage{framed}
-   - \usepackage{setspace}
-   - \usepackage{float}
-   - \usepackage{rotating}
 date: "Day 1"
-output: pdf_document
+output:
+  html_document:
+    toc: true
+  pdf_document: null
+subtitle: EGAP Experiments Workshop
+header-includes:
+- \usepackage{booktabs}
+- \usepackage{multirow}
+- \usepackage{tabularx}
+- \usepackage{framed}
+- \usepackage{setspace}
+- \usepackage{float}
+- \usepackage{rotating}
 ---
 
 #Today: 
@@ -64,7 +67,7 @@ In this short session we go over the main commands you are likely to use in thes
 
 ```{r}
 getwd()
-setwd("/Users/nataliagarbirasdiaz/Dropbox/Academic/UC_Berkeley/EGAP/Training/R_handouts")   
+## setwd("/Users/nataliagarbirasdiaz/Dropbox/Academic/UC_Berkeley/EGAP/Training/R_handouts")   
 ```
 
 + Install any relevant packages (only has to be done once). 
