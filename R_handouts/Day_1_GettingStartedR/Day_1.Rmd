@@ -2,6 +2,14 @@
 title: "Key Tools for Experimental Research Design and Analysis in R"
 subtitle: "EGAP Experiments Workshop"
 author: "Santiago, Chile - May, 2016"
+header-includes:
+   - \usepackage{booktabs}
+   - \usepackage{multirow}  
+   - \usepackage{tabularx}
+   - \usepackage{framed}
+   - \usepackage{setspace}
+   - \usepackage{float}
+   - \usepackage{rotating}
 date: "Day 1"
 output: pdf_document
 ---
@@ -12,7 +20,7 @@ output: pdf_document
      + What is R, how does it function?
      + Key commands
 * Descriptive statistics and plotting
-* Analysis using simulated data
+     + Hands-on: With your own data...
 
 #1. Getting started on R
 
@@ -249,7 +257,7 @@ x <- {
 x
 ```
 
-#2. Hands-on: Descriptive statistics and ploting 
+#2. Descriptive statistics and ploting 
 
 We will create two variables that are normally distributed and then will use different tools to characterize these data.
 
@@ -314,4 +322,236 @@ legend("topright", legend = c("x1","x2","x3","x1+x2"),
        lty = c(1, 1, 1, 2), bg = "gray90")
 
 ```
+
+##2.a. Hands-on: with your own data
+
+Now, use your own data to fill out the table below and to create the following plots:
+
++ Distribution of each one of your primary outcomes of interest
++ Plot the average for each on of your outcome variables by treatment group
+
+\begin{sidewaystable}
+\onehalfspacing
+  \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|}
+    \toprule
+    \multicolumn{1}{|c|}{\multirow{2}{*}{\textit{\textbf{Variable}}}} &
+      \multicolumn{4}{c|}{\textit{\textbf{Treatment group}}} &
+      \multicolumn{4}{c|}{\textit{\textbf{Control group}}} &
+      \multicolumn{4}{c|}{\textit{\textbf{Whole sample}}}
+      \\
+    \cline{2-13}
+    \multicolumn{1}{|c|}{} &
+      \multicolumn{1}{c|}{\textbf{Mean}} &
+      \multicolumn{1}{c|}{\textbf{SD}} &
+      \multicolumn{1}{c|}{\textbf{Min}} &
+      \multicolumn{1}{c|}{\textbf{Max}} &
+      \multicolumn{1}{c|}{\textbf{Mean}} &
+      \multicolumn{1}{c|}{\textbf{SD}} &
+      \multicolumn{1}{c|}{\textbf{Min}} &
+      \multicolumn{1}{c|}{\textbf{Max}} &
+      \multicolumn{1}{c|}{\textbf{Mean}} &
+      \multicolumn{1}{c|}{\textbf{SD}} &
+      \multicolumn{1}{c|}{\textbf{Min}} &
+      \multicolumn{1}{c|}{\textbf{Max}}
+      \\
+      \midrule
+      \textit{Covariates} &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+      \\
+      \hline
+    Pre-treatment outcome variable (if available) &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+      \\
+      \hline
+    Gender &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+      \\
+      \hline
+    SES &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+      \\
+      \hline
+    Years of education &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+      \\
+      \hline
+    Age &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+      \\
+      \hline
+    Covariate 1 &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+      \\
+      \hline
+    Covariate 2 &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+      \\
+      \hline
+      \textit{Outcome variables} &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+      \\
+      \hline
+    Outcome variable 1 &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+      \\
+      \hline
+    Outcome variable 2 &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+      \\
+      \hline
+    Outcome variable 3 &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+      \\
+      \hline
+    Outcome variable 4 &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+      \\
+      \hline
+    Outcome variable 5 &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+       &
+      \\
+    \bottomrule
+    \end{tabular}
+\end{sidewaystable}
+
 
