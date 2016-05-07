@@ -11,7 +11,9 @@ header-includes:
    - \usepackage{float}
    - \usepackage{rotating}
 date: "Day 1"
-output: pdf_document
+output:
+  html_document: null
+  pdf_document: null
 ---
 
 #Today: 
