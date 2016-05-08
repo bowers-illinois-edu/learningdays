@@ -1,0 +1,414 @@
+\documentclass[10pt,ignorenonframetext]{beamer}
+
+
+<<include=FALSE,cache=FALSE>>=
+opts_chunk$set(tidy=FALSE,echo=FALSE,results='markup',fig.path='figs/fig',cache=FALSE,highlight=TRUE,width.cutoff=132,size='footnotesize',out.width='1.2\\textwidth',message=FALSE,comment=NA)
+@
+
+\usepackage{bowers-beamer}
+\graphicspath{{.}{../images/}}
+\newcommand{\framen}[1]{\frame{#1 \note{ }}}
+
+\title[What is a $p$-value?]{What does it mean to test a hypothesis?}
+
+\author[Bowers]{
+  Jake Bowers\inst{1}$,$\inst{2}
+}
+
+\date[7 May 2016]{EGAP Learning Days 4: Chile}
+
+\institute[Illinois]{
+  \inst{1}
+  Political Science \& Statistics \& NCSA @ University of Illinois
+
+  \smallskip
+
+  \inst{2}
+  White House Social and Behavioral Sciences Team
+
+  \smallskip
+
+  {jwbowers@illinois.edu   --- \href{http://jakebowers.org}{http://jakebowers.org} }
+}
+
+\renewcommand{\bibsection}{\subsection*{References}}
+
+
+\begin{document}
+
+\begin{frame}[plain,label=intro,noframenumbering]
+  \titlepage
+\end{frame}
+
+
+
+\begin{frame}
+	\frametitle{Counterfactual Causal \textcolor{orange}{Inference}}
+
+	How can we use what we \textbf{see} to learn about 
+	\only<1>{what we want to \textbf{know}} \only<3>{$\text{a causal effect}_i=f(y_{i,1},y_{i,0})$}
+\only<2>{\textbf{potential outcomes}}?
+	
+
+<<readdata, echo=FALSE>>=
+newsdf <- read.csv("../Data/news.csv")
+@
+
+<<setupnewsdesigntab,echo=FALSE>>=
+newsdf$y1 <- ifelse(newsdf$z==1,newsdf$r,"?")
+newsdf$y0 <- ifelse(newsdf$z==0,newsdf$r,"?")
+
+library(xtable)
+
+newspapers.xtab<-xtable(newsdf[,c("city","s","z","rpre","r","Newspaper","y1","y0")],
+			label="tab:newspapers",
+			caption="Design and outcomes in the Newspapers Experiment.
+			The Treatment column shows treatment randomized
+			within pair with the
+			newspaper ads as 1 and lack of treatment as 0. The
+			potential outcomes are $y_{1}$ for treatment and
+			$y_{0}$ for control.  \\citet{pana2006}
+			provides more detail on the design of the experiment.",
+			align=c("l","l","c","c","c","c","c","c","c"))
+@
+
+<<newsdesigntab,results='asis',echo=FALSE>>=
+print(newspapers.xtab,
+      sanitize.text.function=function(x){x},include.rownames=FALSE,include.colnames=FALSE,
+      table.placement="!ht",##size="small",
+      add.to.row=list(pos=list(-1),
+		      command="&&& \\multicolumn{2}{c}{Turnout} \\\\ City &
+		      Pair & Treatment & \\multicolumn{1}{c}{Baseline} &
+		      \\multicolumn{1}{c}{Outcome} &
+		      \\multicolumn{1}{c}{Newspaper} &
+		      \\multicolumn{1}{c}{$y_{1}$} &
+		      \\multicolumn{1}{c}{$y_{0}$}\\\\"),
+      hline.after=c(0,nrow(newspapers.xtab)))
+@
+
+\only<3>{\textbf{\emph{Small group exercise:}} \textbf{Can you think of
+		\textcolor{orange}{more than one way} to learn about the
+		counterfactual causal effect of treatment using what we
+		observe?}}
+
+\end{frame}
+
+Definition of a p-value. What does it mean?
+
+\begin{frame}
+  \frametitle{What is the true effect of the treatment assignment?}
+
+  \only<1>{
+    \includegraphics[width=.8\textwidth]{cartoonNeymanBayesFisherCropped.pdf} }
+  \only<2>{ \includegraphics[width=.8\textwidth]{cartoon3ATENeyman.pdf} }
+  \only<3>{ \includegraphics[width=.8\textwidth]{cartoonBayes.pdf} }
+  \only<4>{ \includegraphics[width=.8\textwidth]{cartoon4Fisher.pdf} }
+
+\vfill
+
+%%   \only<5->{See also \citet{pearl:2000a} and also
+%% 	  \cite{richardson2013single}. For more on the potential outcomes
+%% 	  approach see \cite{imbens2015causal}. }
+
+\end{frame}
+
+
+\section{Testing Fishers Sharp Null Hypothesis of No Effects}
+
+\begin{frame}[containsverbatim] %,allowframebreaks]
+  \frametitle{Testing the Sharp Null of No Effects}
+
+<<>>=
+options(width=132)
+@
+
+<<sharpnulltest1,echo=TRUE,results='markup',highlight=TRUE,tidy=FALSE,tidy.opts=list(width.cutoff=130)>>=
+Z <- c(0,1,0,1) ## Define treatment vector
+Y <- c(16,22,7,14) ## Define outcome vector
+## There are choose(4,2) ways to assign treatment
+## Make a matrix containing all of the ways to assign treatment
+Om <- matrix(0,ncol=choose(4,2),nrow=length(Z)) ## First fill with zeros
+whotrted <- combn(1:4,2) ## Generate indicators of who is treated
+for(i in 1:choose(4,2)){ Om[cbind(whotrted[,i],i)]<-1 }
+
+## Great a function to summarize the hypothesized
+## treatment to outcome relationship
+meandifftz <- function(y,z){ mean(y[z==1]) - mean(y[z==0]) }
+rankdifftz <- function(y,z){ q<-rank(y); mean(q[z==1]) - mean(q[z==0]) }
+## Apply the function to all possible experiments 
+mdist<-apply(Om,2, function(z){ meandifftz(Y,z) })
+rdist<-apply(Om,2, function(z){ rankdifftz(Y,z) })
+rbind(Om,mdist,rdist)
+@
+
+\end{frame}
+
+\begin{frame}[containsverbatim]
+	\frametitle{continued}
+
+<<sharpnulltest2,echo=TRUE,results='markup',highlight=TRUE,tidy=FALSE,tidy.opts=list(width.cutoff=130)>>=
+table(mdist)
+table(rdist)
+mobs <- meandifftz(Y,Z) ## observed value of test stat
+robs <- rankdifftz(Y,Z) ## observed value of test stat
+mean(mdist >= mobs) ## p-value
+mean(rdist >= robs) ## p-value
+@
+
+\end{frame}
+
+\begin{frame}[containsverbatim,shrink]
+	\frametitle{Faster Method}
+
+<<installdevritools, eval=FALSE,echo=FALSE>>=
+## Only run this once
+if(!dir.exists("libraries")){ dir.create("libraries") }
+.libPaths("libraries") ## make the default place for libraries the local one
+installedpackages<-installed.packages()
+if(!any(installedpackages[,"Package"]=="devtools")) {
+  install.packages("devtools", repos="http://cran.rstudio.com")
+  ## system("touch libraries/RItools/INSTALLED")
+}
+library(devtools)
+install_github("markmfredrickson/RItools@randomization-distribution")
+@
+
+<<sharpnulltest3,echo=TRUE,results='markup',highlight=TRUE,tidy=FALSE,tidy.opts=list(width.cutoff=130)>>=
+library(RItools,lib.loc="libraries") ## see fishersinference.Rnw to get the dev version
+
+## Specify design: only 1 block
+randomassignment<-simpleRandomSampler(z=Z,b=rep(1,4))
+
+meandiffTZ <- function(ys, z) {
+    mean(ys[!(!z)]) - mean(ys[!z])
+}
+
+meandifftest<-RItest(y=Y, z=Z, test.stat=meandiffTZ, sampler = randomassignment)
+meandifftest
+@
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{The Newspapers Study}
+
+  
+<<newsdesigntab2,results='asis',echo=FALSE>>=
+print(newspapers.xtab,
+      sanitize.text.function=function(x){x},include.rownames=FALSE,include.colnames=FALSE,
+      table.placement="!ht",##size="small",
+      add.to.row=list(pos=list(-1),
+		      command="&&& \\multicolumn{2}{c}{Turnout} \\\\ City &
+		      Pair & Treatment & \\multicolumn{1}{c}{Baseline} &
+		      \\multicolumn{1}{c}{Outcome} &
+		      \\multicolumn{1}{c}{Newspaper} &
+		      \\multicolumn{1}{c}{$y_{1}$} &
+		      \\multicolumn{1}{c}{$y_{0}$}\\\\"),
+      hline.after=c(0,nrow(newspapers.xtab)))
+@
+
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{The Newspapers Study: $H_0: y_{i1}=y_{i0}$, $p=6/16$.}
+\centering
+\includegraphics[width=.9\textwidth]{newspapersRandDist1.pdf}
+
+\end{frame}
+
+
+
+\section{Testing Sharp Hypotheses No Effects and No Interference}
+
+\begin{frame}
+  \frametitle{Statistical inference for counterfactual quantities with interference?}
+
+  \centering
+  \includegraphics{complete-graph.pdf}
+
+  \only<1>{
+
+    \includegraphics[width=.95\textwidth]{interference-example.pdf}
+
+  }
+
+  \only<2>{
+    \includegraphics[width=.95\textwidth]{interference-example-2.pdf}
+
+    Introducing the \textbf{uniformity trial} $\equiv \by_{i,0000}$
+    (Rosenbaum, 2007).
+  }
+
+
+\end{frame}
+
+
+\section{Aspects of the approach: The tests do not require asymptopia.}
+
+\begin{frame}
+	\frametitle{Fisherian Tests work when asymptopia is out of reach}
+
+\centering
+\only<1>{\includegraphics[width=.95\textwidth]{newspapersTDist.pdf} }
+\only<2>{\includegraphics[width=.95\textwidth]{newspapersTypeIError.pdf} }
+
+\end{frame}
+
+\section{What is a $p$-value? What does a $p$-value require?}
+
+\begin{frame}
+	\frametitle{What does it mean to test a hypothesis?}
+
+	What is a $p$-value?
+
+	\medskip
+
+	What do we learn from a hypothesis test?
+
+	\medskip
+
+	What do we need to assume to make a hypothesis test (in this simplest
+	case) interpretable?
+
+\end{frame}
+
+\appendix
+
+\section{Sharp Hypotheses of Some Effects. Sharp Hypotheses as Causal Models}
+
+\subsection{The Constant Additive Effect Model}
+
+\begin{frame}
+	\frametitle{What range of effects might be surprising?}
+
+	\begin{description}
+		\item[Hypothesize a model of potential outcomes]
+	For $H_0: y_{i1} = y_{i0} + \tau$, what $\tau$ might be surprising?
+
+\item[Map the model to observation via design] What would $\tau=6$ imply for
+	what we observe? If $\tau=6$ and $Y_i = Z_i y_{i1} + (1-Z_i) y_{i0}$
+	then $Y_i - Z_i 6 = y_{i0}$.
+
+\item[Generate the randomization distribution of this hypothesis] As before
+\item[Summarize information against the hypothesis] For hypotheses of $\tau
+	\ge 6$ we have $p \le .125$  using a mean difference test
+	statistic.
+\end{description}
+
+\centering
+\includegraphics[width=.7\textwidth]{newspapersFig3.pdf}
+
+\end{frame}
+
+\begin{frame}
+	\frametitle{What effects might be least surprising?}
+
+	The idea of a ``best guess'' maps onto the Hodges-Lehmann point
+	estimate: the hypotheses for which $E(t(Z,Y)=0$: ex. the difference of
+	means is zero. Here $\tau=1.5$ for the mean difference and
+	$\tau=3.25$ for the rank-based test (which equalizes medians).
+
+\centering
+\includegraphics[width=.9\textwidth]{newspapersHLAdj.pdf}
+
+\end{frame}
+
+\begin{frame}
+	\frametitle{Theoretical models of potential outcomes can produce sharp
+	hypotheses}
+
+
+\centering
+\only<1>{ \includegraphics[width=.9\textwidth]{fishersutvaNetwork.pdf} }
+\only<2>{ \includegraphics[width=.9\textwidth]{fishersutvaModel.pdf} }
+\only<3>{ \includegraphics[width=.9\textwidth]{fishersutvaResults.pdf} }
+
+
+
+\end{frame}
+
+\begin{frame}{A General Fisherian Inference Algorithm}
+  \begin{enumerate}
+    \item Write a model ($\HH(\yu, \bz, \theta)$) converting uniformity trial
+      into observed data (i.e. a causal model).
+    \item Solve for $\yu$: $\HH(\by_\bz, \bzero, \theta_0) = \yu$
+    \item Select a test statistic that is effect increasing in all relevant
+	    dimensions.
+    \item Compute $p$-values for substantively meaningful range of $\theta$.
+	    Or calculate boundaries of regions.
+  \end{enumerate}
+
+
+  \note{So, let me just summarize our workflow --- which, for those of you
+    familiar with Rosenbaum's approach to Fisher's hypothesis testing, will be
+    very familiar.}
+
+\end{frame}
+
+
+\section{Information arises from both theory and instruments}
+
+\begin{frame}
+	\frametitle{Robust test statistics can increase power.}
+
+	For the simple mean difference test statistic, we have $p=.375$, for a
+	rank sum test (the sum of the ranks of the treated units), we have a
+	$p=.4375$, and for an M-estimator based test (like mean-differences
+	but with weights roughly inversely proportional to the
+	Cook's $D$ influence measure) we have $p=.3125$.
+
+	\centering
+	\includegraphics[width=.8\textwidth]{newspapersCooksD.pdf}
+
+\end{frame}
+
+\begin{frame}
+	\frametitle{Covariance adjusted tests can increase power.}
+
+	Using the difference pre-vs-post as the outcome (comparing treated
+	pre-vs-post with paired control pre-vs-post), and using the robust
+	test statistic for $H_0: y_{i1}=y_{i0}$ $p=4/16=.25$.
+
+	Using $e_i = (Y_i - Y_{i,t-1}) - (\hat{\beta}_0 + \hat{\beta}_1\text{pop} +
+	\hat{\beta}_2 \text{num candidates})$ and the robust test statistic to
+	test $H_0: y_{i1}=y_{i0}$  we have  $p=2/16=.125$.
+
+
+\end{frame}
+
+\section{Summary and Discussion}
+
+\begin{frame}
+	\frametitle{Key features of Fisher's approach}
+
+	\begin{description}
+		\item[Flexible] Any scientific model than can generate
+			implications for all units' potential outcomes can, in
+			principle, produce testable parameters.
+		\item[Design based] Requires knowledge of probability of $Z$
+			not $Y$ or $Y|X$ or $\beta|\gamma$.
+		\item[Finite Sample Oriented] Does not require asymptopia. Can
+			use asymptopia when there for a visit.
+		\item[Can be slow] In between 8 cities and asymptopia is a
+			land of many permutations.
+		\item[Probably conservative] Uses relatively little of the
+			total information we have available about the science.
+	\end{description}
+
+	\textcolor{orange}{If you want to know more read Paul Rosenbaum's work}
+	The version of Fisher's approach I discuss here is built on work by Paul
+	Rosenbaum. Read his work if you want to learn more.
+
+\end{frame}
+
+
+
+\begin{frame}[allowframebreaks]
+        \bibliographystyle{apsr}
+        \bibliography{../BIB/big}
+\end{frame}
+
+\end{document}
+
