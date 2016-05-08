@@ -2,20 +2,8 @@
 title: "Key Tools for Experimental Research Design and Analysis in R"
 author: "Santiago, Chile - May, 2016"
 date: "Day 1"
+output: html_document
 subtitle: EGAP Experiments Workshop
-header-includes:
-- \usepackage{booktabs}
-- \usepackage{multirow}
-- \usepackage{tabularx}
-- \usepackage{framed}
-- \usepackage{setspace}
-- \usepackage{float}
-- \usepackage{rotating}
-output:
-  html_document:
-    toc: true
-  pdf_document:
-    toc: true
 ---
 
 #Today: 
@@ -68,7 +56,7 @@ In this short session we go over the main commands you are likely to use in thes
 
 ```{r}
 getwd()
-## setwd("/Users/nataliagarbirasdiaz/Dropbox/Academic/UC_Berkeley/EGAP/Training/R_handouts")   
+setwd("/Users/nataliagarbirasdiaz/Dropbox/Njala University Workshop on Experiments/Workshop 2016 (Chile)/R_handouts/Day_1_Getting_Started_R")   
 ```
 
 + Install any relevant packages (only has to be done once). 
@@ -329,233 +317,55 @@ legend("topright", legend = c("x1","x2","x3","x1+x2"),
 
 ##2.a. Hands-on: with your own data
 
-Now, use your own data to fill out the table below and to create the following plots:
+The following code will help you to import data in `.csv` or `.dta` (Stata):
+
+```{r, eval=FALSE}
+
+#install.packages("foreign")        # This will let you import data from other formats 
+                                    # Uncomment if not installed yet. 
+library(foreign)
+
+#install.packages("readstata13")    # This will let you import data from Stata 13 
+                                    # Uncomment if not installed yet. 
+library(readstata13)
+
+#Stata files: 
+dta<- read.dta("file_path/file_name.dta")     # Insert right directory path
+dta13<- read.dta13("file_path/file_name.dta") # In case you are importing data from Stata 13
+
+# CSV files: 
+dta.csv <-dta.csv("file_path/file_name.dta") # Insert right directory path  
+
+```
+
+Now, fill out the following table with your data:
+
+---------------------------------------------------------------------------------------------------
+Variable                              Treatment group        Control group        Whole Sample
+--------------------------------- --------------------- --------------------- ---------------------
+                                   Mean  SD  Min   Max   Mean  SD  Min   Max   Mean  SD  Min   Max
+**Covariates**                   
+
+Pre-treatment outcome variable   
+(if available)                   
+
+Covariate 1                      
+
+Covariate 2                      
+
+**Outcome variables**            
+
+Outcome variable 1               
+
+Outcome variable 2               
+---------------------------------------------------------------------------------------------------
+
+
+Finally, use your own data to create the following plots:
 
 + Distribution of each one of your primary outcomes of interest
 + Plot the average for each on of your outcome variables by treatment group
 
-\begin{sidewaystable}
-\onehalfspacing
-  \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|}
-    \toprule
-    \multicolumn{1}{|c|}{\multirow{2}{*}{\textit{\textbf{Variable}}}} &
-      \multicolumn{4}{c|}{\textit{\textbf{Treatment group}}} &
-      \multicolumn{4}{c|}{\textit{\textbf{Control group}}} &
-      \multicolumn{4}{c|}{\textit{\textbf{Whole sample}}}
-      \\
-    \cline{2-13}
-    \multicolumn{1}{|c|}{} &
-      \multicolumn{1}{c|}{\textbf{Mean}} &
-      \multicolumn{1}{c|}{\textbf{SD}} &
-      \multicolumn{1}{c|}{\textbf{Min}} &
-      \multicolumn{1}{c|}{\textbf{Max}} &
-      \multicolumn{1}{c|}{\textbf{Mean}} &
-      \multicolumn{1}{c|}{\textbf{SD}} &
-      \multicolumn{1}{c|}{\textbf{Min}} &
-      \multicolumn{1}{c|}{\textbf{Max}} &
-      \multicolumn{1}{c|}{\textbf{Mean}} &
-      \multicolumn{1}{c|}{\textbf{SD}} &
-      \multicolumn{1}{c|}{\textbf{Min}} &
-      \multicolumn{1}{c|}{\textbf{Max}}
-      \\
-      \midrule
-      \textit{Covariates} &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-      \\
-      \hline
-    Pre-treatment outcome variable (if available) &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-      \\
-      \hline
-    Gender &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-      \\
-      \hline
-    SES &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-      \\
-      \hline
-    Years of education &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-      \\
-      \hline
-    Age &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-      \\
-      \hline
-    Covariate 1 &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-      \\
-      \hline
-    Covariate 2 &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-      \\
-      \hline
-      \textit{Outcome variables} &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-      \\
-      \hline
-    Outcome variable 1 &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-      \\
-      \hline
-    Outcome variable 2 &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-      \\
-      \hline
-    Outcome variable 3 &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-      \\
-      \hline
-    Outcome variable 4 &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-      \\
-      \hline
-    Outcome variable 5 &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-       &
-      \\
-    \bottomrule
-    \end{tabular}
-\end{sidewaystable}
+
 
 
