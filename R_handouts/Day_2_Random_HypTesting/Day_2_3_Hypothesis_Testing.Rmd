@@ -23,17 +23,17 @@ First Steps in Causal inference using R:
      + **Parametric hypothesis testing**
      + **Randomization Inference**
      + **Problem set**
-     
+
 
 #3. Hypothesis Testing
 
-We are going to use the same data created for the Randomization handout. For the purpose of the following exercise, we will assume complete randomization. 
+We are going to use the same data created for the Randomization handout. For the purpose of the following exercise, we will assume complete randomization.
 
 ##Parametric and non-parametric tests
 
 ```{r,echo=FALSE,warning=FALSE,message=FALSE}
 
-# We need 
+# We need
 rm(list = ls())
 set.seed(12345)
 
@@ -46,7 +46,7 @@ samples <- c(60,60,60,60,60,
 N <- sum(samples)
 ID <- 1:N
 
-village <- rep(x = villages, times = samples) 
+village <- rep(x = villages, times = samples)
 
 female <- rep(c(rep(1,30),rep(0,30)),10)
 days.sick.no.device <- rnbinom(n = N,mu = 10,size = 1) + 7
@@ -61,7 +61,7 @@ effect.male <- -2
 effect.female <- -7
 Y1 <- ifelse(test = female == 1,yes = Y0 + effect.female, no = Y0 + effect.male)
 
-data <- data.frame(
+dat <- data.frame(
      ID = ID,
      village = village,
      female = female,
@@ -76,63 +76,63 @@ set.seed(12345)
 
 complete.ra <- sample(complete.ra)
 
-data$complete.ra <- complete.ra
+dat$complete.ra <- complete.ra
 
-data$complete.obs <- with(data,Y1*complete.ra+Y0*(1-complete.ra))
+dat$complete.obs <- with(dat,Y1*complete.ra+Y0*(1-complete.ra))
 
 ```
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60),warning=FALSE, message=FALSE}
 
-# Hypothesis testing 
+# Hypothesis testing
 ##########################################################################
 
-# We want to explore if providing devices does reduce the average number 
+# We want to explore if providing devices does reduce the average number
 # of days in the year that the person was sick. To do this, we want to test whether
-# the average number of days is higher for the control group than it is for the 
-# treatment group. 
+# the average number of days is higher for the control group than it is for the
+# treatment group.
 
-# Using the complete randomization vector, we first need to calculate the average 
-# in each group for our experiment: 
-# Notice that now we will need the observed data: 
+# Using the complete randomization vector, we first need to calculate the average
+# in each group for our experiment:
+# Notice that now we will need the observed data:
 
-av.treat <- mean(data$complete.obs[data$complete.ra==1]) 
-av.control <- mean(data$complete.obs[data$complete.ra==0]) 
-diff.mean<- av.treat-av.control 
+av.treat <- mean(dat$complete.obs[dat$complete.ra==1])
+av.control <- mean(dat$complete.obs[dat$complete.ra==0])
+diff.mean<- av.treat-av.control
 
-# How do we set up a test in this context? 
-# 1. Notice that if our treatment had not effect, then both averages should be 
-# the same. Therefore, our null hypothesis (H0) should be that the difference 
-# between these two means is equal to zero.  
+# How do we set up a test in this context?
+# 1. Notice that if our treatment had not effect, then both averages should be
+# the same. Therefore, our null hypothesis (H0) should be that the difference
+# between these two means is equal to zero.
 
-# NOTE: In particular, we want to know what is the probability to get 
+# NOTE: In particular, we want to know what is the probability to get
 # a difference of means as extreme as the one we observe in the data
 # (perhaps in absolute terms) if the null hypothesis is true, *the p-value*.
 
 # We will do this in two ways: using a t-test and using randomization inference
 # Remember these tests pose different NULL HYPOTHESIS.
 
-# a. T-test 
+# a. T-test
 ##############################################################
 
 # H0: Mean(# of days for treated) - Mean(# of days for control) = 0
 
 # We create a vector with the treated individuals:
-treated <- data$complete.obs[data$complete.ra==1]
+treated <- dat$complete.obs[dat$complete.ra==1]
 treated
 
-# And then calculate their variance 
+# And then calculate their variance
 var1 <- sum((treated - mean(treated))^2) / (length(treated) - 1)
 var1
 
 # And we do the same with units in the control group:
-not_treated <- data$complete.obs[data$complete.ra==0]
+not_treated <- dat$complete.obs[dat$complete.ra==0]
 not_treated
 
 var0 <- sum((not_treated - mean(not_treated))^2) / (length(not_treated) - 1)
 var0
 
-# and with this we can estimate the SE of the difference of means 
+# and with this we can estimate the SE of the difference of means
 # (which we'll get back to tomorrow)
 
 estimated_se <- sqrt(var1/length(treated) + var0/length(not_treated))
@@ -144,103 +144,104 @@ t_stat
 
 # To be able to get the right Student t Distribution, we need to calculate
 # the degrees of freedom (Satterthwaite)
-df <- (var1/length(treated) + var0/length(not_treated))^2 / 
-           ((var1/length(treated))^2 / (length(treated) - 1) + 
+df <- (var1/length(treated) + var0/length(not_treated))^2 /
+           ((var1/length(treated))^2 / (length(treated) - 1) +
            (var0/length(not_treated))^2 / (length(not_treated) - 1))
 df
 
-# Where does our t statistic fall with respect to the student t distribution? 
-# Install ggplot2 if you don't have it. This is a nice package to make plots. 
+# Where does our t statistic fall with respect to the student t distribution?
+# Install ggplot2 if you don't have it. This is a nice package to make plots.
 
 library(ggplot2)
 
 # Generate the sequence of different values of x
 x <- seq(-5, 5, len = 100)
 # Placeholder plot
-p <- qplot(x, geom = "blank") 
-# Plot student t distribution with the parameters just estimated: 
+p <- qplot(x, geom = "blank")
+# Plot student t distribution with the parameters just estimated:
 # i)  df= degrees of freedom (df)
-# ii) ncp = non centrality parameter. We want it to be 0. 
+# ii) ncp = non centrality parameter. We want it to be 0.
 stat <- stat_function(fun=dt, args=list(df=df, ncp=0), col="black", size=1)
-# We add this distribution to placeholder plot and the estimated diff in means: 
-p + stat + geom_vline(xintercept = t_stat, col="red") 
+# We add this distribution to placeholder plot and the estimated diff in means:
+p + stat + geom_vline(xintercept = t_stat, col="red")
 
 # Now we want the p-value. For that we will use the CDF of the distribution
-?pt # to understand better what we are doing
+## ?pt # to understand better what we are doing
 
 # Now, do we want to perform a one tailed or two tailed test?
 
-# One tailed p-value: the distribution is centered in 0 and t_stat<0. 
-# This means that we are looking for the probability that we see 
+# One tailed p-value: the distribution is centered in 0 and t_stat<0.
+# This means that we are looking for the probability that we see
 # a t-stat at least as SMALL (in our case) as this one (lower tail).
 
-# Two tailed p-value: here we would need the same number plus the probability that 
+# Two tailed p-value: here we would need the same number plus the probability that
 # we see a t-stat greater or equal to:
 -t_stat
 
 # First, let's see what's the probability of observing a t-statistic as small
-# as the one we see: 
+# as the one we see:
 pt(t_stat, df=df, ncp=0, lower.tail=TRUE)
 # Now, we need this probability plus the prob in the upper tail. We can do this
-# in one single line of code: 
+# in one single line of code:
 2 * pt(abs(t_stat), df, lower.tail=F)
 
 # We can also do this using the build-in R function called t.test:
-t.test(treated, not_treated, alternative="less") # one tail 
+t.test(treated, not_treated, alternative="less") # one tail
 t.test(treated, not_treated, alternative="two.sided") # two tail
 
-# Another way: we can also estimate this using a regression but we need to 
+# Another way: we can also estimate this using a regression but we need to
 # correct our standard errors to account for the possibility
 # of different variances between treatment and control groups.
-lm(complete.obs~complete.ra, data=data)
+lm(complete.obs~complete.ra, data=dat)
 
-# b. Randomization inference 
+# b. Randomization inference
 ######################################################
 
-# Recall that the SHARP null hypothesis in RI is: 
+# Recall that the SHARP null hypothesis in RI is:
 # H0: y_i(1) - y_i(0) = 0 for ALL units
 
-# The sharp null allows us to "see" the full schedule of potential outcomes. 
+# The sharp null allows us to "see" the full schedule of potential outcomes.
 # Thus, we can generate a distribution of the estimated difference of means
-# we would have seen over replications of the experiment if the null is TRUE. 
+# we would have seen over replications of the experiment if the null is TRUE.
 
-# In general there are two options to do this. 
-# 1) We produce a matrix of all possible treatment vectors by permuting  
+# In general there are two options to do this.
+# 1) We produce a matrix of all possible treatment vectors by permuting
 #    the number of treatedand total number of observations.
 # 2) If the actual number of permutations is too big, we can instead replicate treatment
-#    assignment a large number of times (e.g., 10,000 times) 
+#    assignment a large number of times (e.g., 10,000 times)
 
 
-# Because if the true parmutation matrix is too large,  
+# Because if the true parmutation matrix is too large,
 choose(600,400)
 # we use method 2): We replicate treatment assignment 10,000 and only
 # keep unique vectors:
+set.seed(12345)
 perm_matrix <- matrix(NA, 10000, 600)
 for (i in 1:10000){
-perm_matrix[i,] <- sample(data$complete.ra, 600, replace=F)
+	perm_matrix[i,] <- sample(dat$complete.ra, 600, replace=F)
 }
 perm_matrix<-unique(perm_matrix)
 
-# We now estimate the difference in means for each possible randomization. 
+# We now estimate the difference in means for each possible randomization.
 
-# We can use a loop for doing this: 
-rand_ate <- NA # placeholder vector for results
+# We can use a loop for doing this:
+randmeandiff <- NA # placeholder vector for results
 for (i in 1:nrow(perm_matrix)){ # for each one of the "fake" treatment vectors
 
-  mean_treat <- mean(data$complete.obs[perm_matrix[i,]==1])
-  
-  mean_control <- mean(data$complete.obs[perm_matrix[i,]==0])
-  
+  mean_treat <- mean(dat$complete.obs[perm_matrix[i,]==1])
+
+  mean_control <- mean(dat$complete.obs[perm_matrix[i,]==0])
+
   # calculating difference of means for this randomization
-  rand_ate[i] <- mean_treat - mean_control
-  
+  randmeandiff[i] <- mean_treat - mean_control
+
 }
 
-summary(rand_ate) # vector of permutation of differences. 
+summary(randmeandiff) # vector of permutation of differences.
 
 # We can make a plot to better see the results:
 
-hist(rand_ate, breaks=50, 
+hist(randmeandiff, breaks=50,
      main="Permutation distribution",
      xlab= "Value of test statistic",
      ylab = "Freq.", xlim=c(-5,5))
@@ -250,14 +251,72 @@ abline(v=diff.mean, lwd=3, col="slateblue")
 # How do we calculate the p-values in this context?
 
 # One tailed
-sum(rand_ate<=diff.mean)/length(rand_ate)
+sum(randmeandiff<=diff.mean)/length(randmeandiff)
 
 # Two tailed
-sum(abs(rand_ate)<=diff.mean)/length(rand_ate)
+sum(abs(randmeandiff)<=diff.mean)/length(randmeandiff)
 
 ```
 
-##3.b.Problem set 
+### Using RITest
+
+A development version of RItools allows for tests of sharp hypotheses for many different test statistics and randomization designs. Because it is a development version it does not have great documentation yet and has to be installed directly from github. For that reason, we recommend that you install it to a local library and not to your main R library. 
+
+```{r}
+if(!dir.exists("libraries")){ dir.create("libraries") }
+.libPaths("libraries") ## make the default place for libraries the local one
+
+installedpackages<-installed.packages()
+if(!any(installedpackages[,"Package"]=="devtools")) {
+	  install.packages("devtools", repos="http://cran.rstudio.com")
+}
+library(devtools)
+ritoolsinstalled<-installed.packages(lib.loc="libraries")
+if(!any(ritoolsinstalled[,"Package"]=="RItools")){
+	install_github("markmfredrickson/RItools@randomization-distribution")
+}
+library(RItools,lib.loc="libraries")
+
+```
+
+This replicates above with a simpler function:
+
+```{r}
+
+## Not blocked
+thedesign<-simpleRandomSampler(z=dat$complete.ra,b=rep(1,nrow(dat)))
+
+meandiffTZ <- function(ys, z) { mean(ys[!(!z)]) - mean(ys[!z]) }
+
+set.seed(12345)
+meandifftest<-RItest(y=dat$complete.obs, z=dat$complete.ra, test.stat=meandiffTZ, sampler = thedesign,samples=10000)
+## FOr now, by default, reports the upper p.value
+1-meandifftest
+
+```
+
+Compare to a Normal approximation:
+
+```{r}
+
+xb1<-xBalance(complete.ra ~ complete.obs, data=dat,report="all")
+xb1
+
+``` Notice, that in this case, you could have done the test much faster with
+`xBalance` because the large sample size and simple outcome allows for a
+Central Limit Theorem to operate.
+
+```{r}
+par(mfrow=c(2,1))
+qqnorm(randmeandiff)
+qqline(randmeandiff)
+
+plot(density(randmeandiff))
+curve(dnorm(x,sd=sd(randmeandiff),mean=mean(randmeandiff)),add=TRUE,lty=2)
+```
+
+
+##3.b.Problem set
 
 ###Question 1
 
@@ -266,28 +325,28 @@ Imagine that you are still working on the project in India that runs an interven
 There is a treatment variable (called treat), where $1 =$ intervention received (treatment) and $2 =$ no intervention received (control). Our "Y" variable, or outcome variable, is called `testscore`.
 
   1. Ultimately, you want to test the a sharp null hypothesis (i.e. that there is no treatment effect). Write out first in formal notation the null hypothesis and the alternative hypothesis below.  Use Y1 to denote the treatment group and Y0 to denote the control group.
-  
-  + $H_0$ 
+
+  + $H_0$
 
 
 
-  + $H_a$ 
+  + $H_a$
 
 
 
   2. Now write out in full sentences what the above notation means, referring to the project described above where the outcome variable of interest is test scores and the intervention is additional teacher support (assistance from student teachers) in treatment school classrooms.
-  
-  + $H_0$ 
+
+  + $H_0$
 
 
 
-  + $H_a$ 
+  + $H_a$
 
 
 
   3. Fill in the table below with the mean and standard deviations for the whole sample, the treatment group, and the control group.
 
-	
+
 |                    | Whole Sample | Treatment | Control |
 |--------------------|--------------|-----------|---------|
 | Mean               |              |           |         |
@@ -297,38 +356,38 @@ There is a treatment variable (called treat), where $1 =$ intervention received 
 
 
   4. Using the above table, what is the estimated treatment effect?
-	
 
 
-	
-  5. Run the hypothesis test code (under Question 1d in the R script) and fill in the table below. 
 
-	
+
+  5. Run the hypothesis test code (under Question 1d in the R script) and fill in the table below.
+
+
     | Estimated Treatment Effect | Null Hypothesis Treatment Effect | $p$-value |
     |----------------------------|----------------------------------|-----------|
-    |                            |                                  |           |  
     |                            |                                  |           |
-	
-  
+    |                            |                                  |           |
+
+
   6. What can you conclude about the teacher support intervention from these results?
-	
-  + At the 0.1 significance level 
+
+  + At the 0.1 significance level
 
 
 
-  + At the 0.05 significance level? 
+  + At the 0.05 significance level?
 
 
 
 
-  + At the 0.01 significance level? 
-  
-  
-  
+  + At the 0.01 significance level?
 
-  7. Based on your results, would you suggest to the government that they should scale up this project to the whole country? Why or why not? 
-	
-	
+
+
+
+  7. Based on your results, would you suggest to the government that they should scale up this project to the whole country? Why or why not?
+
+
 
 ##Main Points to Remember About Hypothesis Testing
 
