@@ -130,10 +130,9 @@ opts_chunk$set(tidy=FALSE,echo=FALSE,results='markup',fig.path='figs/fig',cache=
 	\frametitle{Counterfactual Causal \textcolor{orange}{Inference}}
 
 	How can we use what we \textbf{see} to learn about \only<1>{what we want to
-		\textbf{know}} \only<2->{\textbf{potential outcomes}}?
+		\textbf{know}} \only<2->{\textbf{potential outcomes}
+		($\text{causal effect}_i=f(y_{i,1},y_{i,0})$}?
 
-	The effect of treatment can be defined in different ways using
-	potential outcomes (leaving it vague for now).
 
 <<readdata, echo=FALSE>>=
 newsdf <- read.csv("../Data/news.csv")
@@ -177,6 +176,8 @@ print(newspapers.xtab,
 		observe?}}
 
 \end{frame}
+
+Definition of a p-value. What does it mean?
 
 \begin{frame}
   \frametitle{What is the true effect of the treatment assignment?}
