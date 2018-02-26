@@ -12,22 +12,14 @@ opts_chunk$set(tidy=FALSE,echo=FALSE,results='markup',fig.path='figs/fig',cache=
 \title[Counterfactual Causal Infernce]{Introducing Counterfactual Causal Inference}
 
 \author[Bowers]{
-  Jake Bowers\inst{1}$,$\inst{2}
+  Jake Bowers\inst{1}%,$\inst{2}
 }
 
-\date[7 May 2016]{EGAP Learning Days 4: Chile}
+\date[25 Feb 2018]{EGAP Learning Days: Uruguay}
 
 \institute[Illinois]{
-  \inst{1}
+  %\inst{1}
   Political Science \& Statistics \& NCSA @ University of Illinois
-
-  \smallskip
-
-  \inst{2}
-  White House Social and Behavioral Sciences Team
-
-  \smallskip
-
   {jwbowers@illinois.edu   --- \href{http://jakebowers.org}{http://jakebowers.org} }
 }
 
@@ -41,7 +33,7 @@ opts_chunk$set(tidy=FALSE,echo=FALSE,results='markup',fig.path='figs/fig',cache=
 \end{frame}
 
 
-\section{What might ``cause'' mean?}
+\section{What might ``cause'' \textbf{mean}?: Definitions and Conceptualization}
 
 \begin{frame}
 	\frametitle{Some of my recent causal questions}
@@ -50,50 +42,89 @@ opts_chunk$set(tidy=FALSE,echo=FALSE,results='markup',fig.path='figs/fig',cache=
 	attitudes about violence, the role of women in society, or the role
 	of youth in society?
 
+	%Award winning soap opera that is supposed to change behavior
+
+	\only<2>{
+	\centering \includegraphics[width=.7\textwidth]{Arewa_pic1.png}}
+
 	\medskip
 
-	Did a \href{https://vine.co/v/ibQ1KIIadve}{short video message} from Michelle Obama increase college
-	attendence among low income youth in the USA?
+	Will adding education counselors to public housing in the USA increase
+	the numbers of low
+	income youth enrolled in post-secondary education (like university)
+	and receiving financial aid for their education?
+
+	\only<3>{
+	\centering \includegraphics[width=.4\textwidth]{hudamps.pdf}}
+
+	%Did a \href{https://vine.co/v/ibQ1KIIadve}{short video message} from Michelle Obama increase college
+	%attendence among low income youth in the USA?
 
 	\medskip
 
-	Does information about whether an election is contested increase
-	mail-in voting among US farmers?
+	Did the UKIP (anti-immigrant) party in the UK influence how individuals
+	\textbf{see} the ethnic characteristics of their communities?
 
-	\begin{figure}
-		\centering
-		\includegraphics[width=.3\textwidth]{sbst-usda-originalballot.pdf}
-		\includegraphics[width=.3\textwidth]{sbst-usda-treatmentballot.pdf}
-	\end{figure}
+	\only<4>{
+	\centering \includegraphics[width=.5\textwidth]{beslondonmaps.pdf}}
+
+
+
+	%Does information about whether an election is contested increase
+	%mail-in voting among US farmers?
+
+%	\begin{figure}
+%		\centering
+%		\includegraphics[width=.3\textwidth]{sbst-usda-originalballot.pdf}
+%		\includegraphics[width=.3\textwidth]{sbst-usda-treatmentballot.pdf}
+%	\end{figure}
 
 \end{frame}
 
 \begin{frame}
-\frametitle{What does ``cause'' mean?}
+	\frametitle{What does ``cause'' mean?}
 
-``X causes Y'' might mean:
+When someone says ``$X$ causes $Y$'' they might mean:
 
 \begin{description}
 	\item[Persistent association]<1-> ``We always/mostly see $Y=1$ when $X=1$
 		and $Y=0$ when $X=0$.''
-	\item[Counterfactual Difference]<2-> ``If  $X$ had not been 1, then $Y$
-		would not have been 1.''
-	\item[Difference after manipulation]<3-> ``When we change $X$ from 0 to
-		1, then $Y$ changes from 0 to 1.'' (establishes causal
+	\item[Counterfactual Difference]<2-> ``If  $X$ had not been this value, then $Y$
+		would not have been that value.''
+	\item[Difference after manipulation]<3-> ``When we change $X$ from one
+		value to another value, then $Y$ changes from one value to
+		another value.'' (establishes causal
 		priority of $X$ over $Y$).
-	\item[Difference after operation of a mechanism]<4-> ``$X$ causes $Y$
-		because once upon a time \ldots until one day \ldots and because of that,
-		until finally.''
+	\item[Difference after operation of a mechanism]<4-> ``Once upon a
+		time $A$ changed $X$, and then one day $X$ changed $B$, and
+		because of that $B$
+		changed $C$, and finally $C$ changed $Y$.''
 	\item[other\ldots]
 \end{description}
 
-\only<5->{Most randomized experiments combine the manipulation and counterfactual definitions.}
+%\only<5->{Most randomized experiments combine the manipulation and counterfactual definitions.}
 
-\vfill
 
-\footnotesize{\emph{Extra:} If you want to dig into this see \citet{brady2008cae}. }
+\only<6->{Difference research designs help us \textbf{make the case} for a
+	\textbf{claim} that ``$X$ causes $Y$'' more or less strongly given
+different conceptualizations.
+
+\medskip
+
+Often, \textbf{experiments} aim to \textbf{manipulate} parts of
+expected/theoretical mechanisms to reveal counter-factuals rather than aim to document persistent
+and wide-spread association.
+
+}
+
+	\vfill
+
+\footnotesize{
+\emph{Extra:} If you want to dig into this see \citet{brady2008cae}. }
 
 \end{frame}
+
+
 
 \section{Why randomize?}
 
@@ -109,16 +140,34 @@ opts_chunk$set(tidy=FALSE,echo=FALSE,results='markup',fig.path='figs/fig',cache=
 	attitudes about violence, the role of women in society, or the role
 	of youth in society?
 
-	\begin{enumerate}	
+	\begin{enumerate}
 
 		\item What would be an ideal observational study design? (no randomization)
-	What questions would people ask when you claim that your results reflect a
+	What questions would critical readers ask when you claim that your results reflect a
 	causal relationship?
 
 \item What would be an ideal experimental study design? (including
-	randomization)  What questions would people ask when you claim that your
+	randomization)  What questions would critical readers ask when you claim that your
 	results reflect a causal relationship?
 \end{enumerate}
+
+\end{frame}
+
+\begin{frame}
+	\frametitle{Why randomize?}
+
+	Randomization produces \textbf{fair} comparisons (ex. impersonal, no
+	systematic differences between groups).
+
+	Randomization helps us reason about information/uncertainty: \\
+	\begin{verse}
+	Q: ``What does this $p$-value mean?" \\
+	A: ``It is the probability of seeing a result as extreme as
+	\textcolor{orange}{this} in the world of the null hypothesis."
+	Q: ``What do you mean by \textcolor{blue}{probability} or `world of
+	the null hypothesis'"?
+\end{verse}
+
 
 \end{frame}
 
@@ -126,12 +175,11 @@ opts_chunk$set(tidy=FALSE,echo=FALSE,results='markup',fig.path='figs/fig',cache=
 
 \section{Overview of Statistical Inference for Causal Quantities}
 
-\begin{frame}
+\begin{frame}[shrink]
 	\frametitle{Counterfactual Causal \textcolor{orange}{Inference}}
 
 	How can we use what we \textbf{see} to learn about \only<1>{what we want to
-		\textbf{know}} \only<2->{\textbf{potential outcomes}
-		($\text{causal effect}_i=f(y_{i,1},y_{i,0})$}?
+		\textbf{know}} \only<2->{\textbf{potential outcomes} ($\text{causal effect}_i=f(y_{i,1},y_{i,0})$})?
 
 
 <<readdata, echo=FALSE>>=
@@ -173,7 +221,7 @@ print(newspapers.xtab,
 \only<3>{\textbf{\emph{Small group exercise:}} \textbf{Can you think of
 		\textcolor{orange}{more than one way} to learn about the
 		counterfactual causal effect of treatment using what we
-		observe?}}
+		observe from an experiment?}}
 
 \end{frame}
 
@@ -240,12 +288,13 @@ mean(thedist >= theobs)
 	\frametitle{What do we need to interpret our calculations as teaching
 		about causal quantities?}
 
-	\only<1->{ For the sharp null test: Randomization occurred as reported.}
+	\only<1->{For the sharp null test: Randomization occurred as
+	reported.}
 
 	\medskip
 
-	\only<2->{ For the average treatment effect: Randomization occurred
-		as reported plus no interference between units. }
+	\only<2->{For the average treatment effect: Randomization occurred
+		as reported plus no interference between units.}
 
 \end{frame}
 
