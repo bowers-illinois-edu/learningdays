@@ -111,7 +111,8 @@ different conceptualizations.
 
 \medskip
 
-Often, \textbf{experiments} aim to \textbf{manipulate} parts of
+Often, \textbf{experiments} aim to \textbf{manipulate} (\textbf{by
+randomization}) parts of
 expected/theoretical mechanisms to reveal counter-factuals rather than aim to document persistent
 and wide-spread association.
 
