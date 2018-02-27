@@ -12,19 +12,14 @@ opts_chunk$set(tidy=FALSE,echo=FALSE,results='markup',fig.path='figs/fig',cache=
 \title[What is a $p$-value?]{What does it mean to test a hypothesis?}
 
 \author[Bowers]{
-  Jake Bowers\inst{1}$,$\inst{2}
+  %Jake Bowers\inst{1}$,$\inst{2}
+  Jake Bowers\inst{1}
 }
 
-\date[8 May 2016]{EGAP Learning Days 4: Chile}
+\date[27 Feb 2018]{EGAP Learning Days 9: Uruguay}
 
 \institute[Illinois]{
-  \inst{1}
   Political Science \& Statistics \& NCSA @ University of Illinois
-
-  \smallskip
-
-  \inst{2}
-  White House Social and Behavioral Sciences Team
 
   \smallskip
 
@@ -47,7 +42,7 @@ opts_chunk$set(tidy=FALSE,echo=FALSE,results='markup',fig.path='figs/fig',cache=
 
 	How can we use what we \textbf{see} to learn about 
 	\only<1>{what we want to \textbf{know}} \only<3>{$\text{a causal effect}_i=f(y_{i,1},y_{i,0})$}
-\only<2>{\textbf{potential outcomes}}?
+	\only<2>{\textbf{\textcolor{blue}{potential outcomes}}}?
 	
 
 <<readdata, echo=FALSE>>=
@@ -98,8 +93,7 @@ Definition of a p-value. What does it mean?
 \begin{frame}
   \frametitle{What is the true effect of the treatment assignment?}
 
-  \only<1>{
-    \includegraphics[width=.8\textwidth]{cartoonNeymanBayesFisherCropped.pdf} }
+  \only<1>{ \includegraphics[width=.8\textwidth]{cartoonNeymanBayesFisherCropped.pdf} }
   \only<2>{ \includegraphics[width=.8\textwidth]{cartoon3ATENeyman.pdf} }
   \only<3>{ \includegraphics[width=.8\textwidth]{cartoonBayes.pdf} }
   \only<4>{ \includegraphics[width=.8\textwidth]{cartoon4Fisher.pdf} }
@@ -115,14 +109,105 @@ Definition of a p-value. What does it mean?
 
 \section{Testing Fishers Sharp Null Hypothesis of No Effects}
 
+
+
+\begin{frame}[containsverbatim,allowframebreaks]
+  \frametitle{Testing the Sharp Null of No Effects Practically}
+  \framesubtitle{Ingredients: Hypothesis, Test Statistic Function, Distribution}
+
+<<>>=
+options(width=132)
+library(randomizr)
+@
+
+<<sharpnulltest1,echo=TRUE,results='markup',highlight=TRUE,tidy=FALSE,tidy.opts=list(width.cutoff=130)>>=
+newexperiment <- function(block){
+	block_ra(blocks=block)
+}
+
+testStat1 <- function(y,z,b){
+	## Diff of means
+  ## y is outcome
+  ## z is treatment (binary here)
+  ## b is block
+  if(length(unique(b))==1){
+    ## if only one block, then this is a simple mean difference
+    return(mean(y[z==1]) - mean(y[z==0]))
+  } else {
+    z <- z[order(b)]
+    ys <- y[order(b)]
+    ysdiffs <- ys[z==1] - ys[z==0]  ## assuming sorted by pair
+    meandiffs <- mean(ysdiffs)
+    return(meandiffs)
+  }
+}
+
+
+testStat2 <- function(y,z,b){
+	## Diff of mean ranks
+  ## y is outcome
+  ## z is treatment (binary here)
+  ## b is block
+  y <- rank(y) ## 
+  if(length(unique(b))==1){
+    ## if only one block, then this is a simple mean difference
+    return(mean(y[z==1]) - mean(y[z==0]))
+  } else {
+    z <- z[order(b)]
+    ys <- y[order(b)]
+    ysdiffs <- ys[z==1] - ys[z==0]  ## assuming sorted by pair
+    meandiffs <- mean(ysdiffs)
+    return(meandiffs)
+  }
+}
+
+obsTestStat1 <- with(newsdf,testStat1(y=r,z=z,b=sF))
+obsTestStat2 <- with(newsdf,testStat2(y=r,z=z,b=sF))
+set.seed(12345)
+refDistNull1 <- replicate(1000,with(newsdf,testStat1(y=r,z=newexperiment(b=sF),b=sF)))
+refDistNull2 <- replicate(1000,with(newsdf,testStat2(y=r,z=newexperiment(b=sF),b=sF)))
+
+@
+
+\end{frame}
+
+
+\begin{frame}[containsverbatim,allowframebreaks]
+  \frametitle{Testing the Sharp Null of No Effects Practically}
+  \framesubtitle{Ingredients: Hypothesis, Test Statistic Function, Distribution}
+
+\only<1>{
+<<sharpnulltest1ps,echo=TRUE,results='markup',highlight=TRUE,tidy=FALSE,tidy.opts=list(width.cutoff=130)>>=
+p1SideMean <- mean(refDistNull1>=obsTestStat1)
+p1SideRank<-mean(refDistNull2>=obsTestStat2)
+p2SideMean<-2*min(mean(refDistNull1>=obsTestStat1),mean(refDistNull1<=obsTestStat1))
+p2SideRank <- 2*min(mean(refDistNull2>=obsTestStat2),mean(refDistNull2<=obsTestStat2))
+@
+}
+
+\only<2>{
+<<echo=FALSE>>=
+plot(density(refDistNull2),xlim=range(c(refDistNull1,refDistNull2)))
+rug(refDistNull2,line= -1,lwd=2)
+lines(density(refDistNull1),lty=2)
+rug(refDistNull1,line=.5,lwd=2)
+abline(v=obsTestStat2)
+abline(v=obsTestStat1)
+@
+}
+
+\end{frame}
+
+
+
 \begin{frame}[containsverbatim] %,allowframebreaks]
-  \frametitle{Testing the Sharp Null of No Effects}
+  \frametitle{Testing the Sharp Null of No Effects Exactly}
 
 <<>>=
 options(width=132)
 @
 
-<<sharpnulltest1,echo=TRUE,results='markup',highlight=TRUE,tidy=FALSE,tidy.opts=list(width.cutoff=130)>>=
+<<sharpnulltest1exact,echo=TRUE,results='markup',highlight=TRUE,tidy=FALSE,tidy.opts=list(width.cutoff=130)>>=
 Z <- c(0,1,0,1) ## Define treatment vector
 Y <- c(16,22,7,14) ## Define outcome vector
 ## There are choose(4,2) ways to assign treatment
@@ -250,9 +335,21 @@ print(newspapers.xtab,
 \begin{frame}
 	\frametitle{Fisherian Tests work when asymptopia is out of reach}
 
+	\only<1>{
+	Which distribution should we use?
+<<>>=
+
+lmpvalue <- summary(lm(r~z+sF,data=newsdf))$coef["z",4]
+#vs
+2*min(mean(refDistNull1>=obsTestStat1),mean(refDistNull1<=obsTestStat1))
+
+@
+}
+
+
 \centering
-\only<1>{\includegraphics[width=.95\textwidth]{newspapersTDist.pdf} }
-\only<2>{\includegraphics[width=.95\textwidth]{newspapersTypeIError.pdf} }
+\only<2>{\includegraphics[width=.95\textwidth]{newspapersTDist.pdf} }
+\only<3>{\includegraphics[width=.95\textwidth]{newspapersTypeIError.pdf} }
 
 \end{frame}
 

@@ -121,7 +121,9 @@ and wide-spread association.
 	\vfill
 
 \footnotesize{
-\emph{Extra:} If you want to dig into this see \citet{brady2008cae}. }
+\emph{Extra:} If you want to dig into this see \citet{brady2008cae}.
+\url{http://egap.org/resources/guides/causality/}
+}
 
 \end{frame}
 
@@ -161,10 +163,11 @@ and wide-spread association.
 	systematic differences between groups).
 
 	Randomization helps us reason about information/uncertainty: \\
+
 	\begin{verse}
 	Q: ``What does this $p$-value mean?" \\
 	A: ``It is the probability of seeing a result as extreme as
-	\textcolor{orange}{this} in the world of the null hypothesis."
+	\textcolor{orange}{this} in the world of the null hypothesis." \\
 	Q: ``What do you mean by \textcolor{blue}{probability} or `world of
 	the null hypothesis'"?
 \end{verse}
@@ -292,12 +295,16 @@ mean(thedist >= theobs)
 	\only<1->{For the sharp null test: Randomization occurred as
 	reported.}
 
+	%% INCLUDE SLIDE FROM YALE TALK ON INTERFERENCE AND SHARP NULL
+
 	\medskip
 
 	\only<2->{For the average treatment effect: Randomization occurred
 		as reported plus no interference between units.}
 
 \end{frame}
+
+\section{Later: Weaknesses of randomized experiments.}
 
 
 \begin{frame}[allowframebreaks]
