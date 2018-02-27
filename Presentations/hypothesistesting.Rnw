@@ -2,6 +2,7 @@
 
 
 <<include=FALSE,cache=FALSE>>=
+require(knitr)
 opts_chunk$set(tidy=FALSE,echo=FALSE,results='markup',fig.path='figs/fig',cache=FALSE,highlight=TRUE,width.cutoff=132,size='footnotesize',out.width='1.2\\textwidth',message=FALSE,comment=NA)
 @
 
@@ -35,15 +36,15 @@ opts_chunk$set(tidy=FALSE,echo=FALSE,results='markup',fig.path='figs/fig',cache=
   \titlepage
 \end{frame}
 
-
+\section{Why test a hypothesis? What is a hypothesis?}
 
 \begin{frame}
 	\frametitle{Counterfactual Causal \textcolor{orange}{Inference}}
 
-	How can we use what we \textbf{see} to learn about 
+	How can we use what we \textbf{see} to learn about
 	\only<1>{what we want to \textbf{know}} \only<3>{$\text{a causal effect}_i=f(y_{i,1},y_{i,0})$}
 	\only<2>{\textbf{\textcolor{blue}{potential outcomes}}}?
-	
+
 
 <<readdata, echo=FALSE>>=
 newsdf <- read.csv("../Data/news.csv")
@@ -148,7 +149,7 @@ testStat2 <- function(y,z,b){
   ## y is outcome
   ## z is treatment (binary here)
   ## b is block
-  y <- rank(y) ## 
+  y <- rank(y) ##
   if(length(unique(b))==1){
     ## if only one block, then this is a simple mean difference
     return(mean(y[z==1]) - mean(y[z==0]))
@@ -220,7 +221,7 @@ for(i in 1:choose(4,2)){ Om[cbind(whotrted[,i],i)]<-1 }
 ## treatment to outcome relationship
 meandifftz <- function(y,z){ mean(y[z==1]) - mean(y[z==0]) }
 rankdifftz <- function(y,z){ q<-rank(y); mean(q[z==1]) - mean(q[z==0]) }
-## Apply the function to all possible experiments 
+## Apply the function to all possible experiments
 mdist<-apply(Om,2, function(z){ meandifftz(Y,z) })
 rdist<-apply(Om,2, function(z){ rankdifftz(Y,z) })
 rbind(Om,mdist,rdist)
@@ -278,7 +279,7 @@ meandifftest
 \begin{frame}
   \frametitle{The Newspapers Study}
 
-  
+
 <<newsdesigntab2,results='asis',echo=FALSE>>=
 print(newspapers.xtab,
       sanitize.text.function=function(x){x},include.rownames=FALSE,include.colnames=FALSE,
@@ -332,24 +333,80 @@ print(newspapers.xtab,
 
 \section{Aspects of the approach: The tests do not require asymptopia.}
 
-\begin{frame}
-	\frametitle{Fisherian Tests work when asymptopia is out of reach}
+\begin{frame}[containsverbatim,shrink]
+	\frametitle{Permutations vs Central Limit Theorem?}
 
-	\only<1>{
 	Which distribution should we use?
-<<>>=
 
+<<lmps,echo=TRUE,results='markup',highlight=TRUE,tidy=FALSE,tidy.opts=list(width.cutoff=130)>>=
 lmpvalue <- summary(lm(r~z+sF,data=newsdf))$coef["z",4]
-#vs
-2*min(mean(refDistNull1>=obsTestStat1),mean(refDistNull1<=obsTestStat1))
-
+lmpvalue
+p2SideMean
 @
-}
 
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{Permutations vs Central Limit Theorem?}
+
+	The false positive rates of permutation based tests are controlled
+	for both small and large sample sizes.
 
 \centering
 \only<2>{\includegraphics[width=.95\textwidth]{newspapersTDist.pdf} }
 \only<3>{\includegraphics[width=.95\textwidth]{newspapersTypeIError.pdf} }
+
+\end{frame}
+
+
+\begin{frame}[containsverbatim,shrink]
+	\frametitle{What about when samples are large?}
+
+<<>>=
+set.seed(20180225)
+N <- 1000
+y0 <- rchisq(N,df=1)
+y1 <- y0 + rnorm(N,mean=0,sd=sd(y0))## No treatment effect but different variance
+Z <- complete_ra(N) ## very simple randomization
+Y <- Z*y1 + (1-Z) * y0 ## randomization reveals a potential outcome
+
+newexpComplete <- function(N){
+	complete_ra(N)
+}
+
+testStat3 <- function(y,z){
+	## Diff of means
+  ## y is outcome
+  ## z is treatment (binary here)
+    md <- mean(y[z==1]) - mean(y[z==0])
+    return(md)
+  }
+
+
+
+obsTestStat <- testStat3(y=Y,z=Z)
+randDist <- replicate(1000,testStat3(y=Y,z=newexpComplete(N)))
+mean(randDist >= obsTestStat)
+2* min( mean(randDist >= obsTestStat), mean(randDist <= obsTestStat))
+@
+
+<<>>=
+library(sandwich)
+library(lmtest)
+
+thelm <- lm(Y~Z)
+theSEs <- coeftest(thelm,vcov=vcovHC(thelm,type="HC2"))
+theSEs[2,4]
+@
+
+
+<<>>=
+plot(density(randDist))
+curve(dnorm(x,sd=theSEs[2,2],mean=0),from=-1,to=1,col="blue", add=TRUE)
+@
+
+
 
 \end{frame}
 
@@ -476,6 +533,28 @@ lmpvalue <- summary(lm(r~z+sF,data=newsdf))$coef["z",4]
 \end{frame}
 
 \section{Summary and Discussion}
+
+
+\begin{frame}
+\frametitle{Why test a hypothesis? What is a hypothesis?}
+
+(1) In an experiment a hypothesis is a claim or model about the relationship among potential
+outcomes; about unobserved outcomes.
+
+(2) In an experiment a hypothesis test allows a form of causal inference (or statistical
+inference about a counterfactual causal effect)
+
+\end{frame}
+
+\begin{frame}
+	\frametitle{Where does the reference distribution come from? What
+	justifies it?}
+
+How to make a distribution? Where do they come from? How do we justify our
+choices?
+
+
+\end{frame}
 
 \begin{frame}
 	\frametitle{Key features of Fisher's approach}
