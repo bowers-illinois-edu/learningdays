@@ -138,7 +138,7 @@ dat <- data.frame(cbind(Xdat,Y=Y,Z=Z,y0=y0,y1=y1))
 
 ## Example 1: Randomization Assessment
 
-Hansen and Bowers (2008) developed an omnibus balance test that refers to a Normal distribution that approximates the randomization-based reference distribution in large-samples.
+Hansen and Bowers (2008) developed an omnibus balance test that refers to a Normal distribution that approximates the randomization-based reference distribution in large-samples. (see the help page for `balanceTest` for `strata()` and `cluster()` arguments for block and/or clustered designs)
 
 ```{r}
 balfmla <- reformulate(names(Xdat),response="Z")
@@ -181,10 +181,14 @@ getPvalues <- function(){
   theglm0 <- glm(newZ~1,data=dat,family=binomial())
   theanova <- anova(theglm0,theglm1,test="Chisq")
   anovap <- theanova[2,"Pr(>Chi)"]
+
   return(c(btp = btp, anovap = anovap))
 }
+```
 
+```{r repgetp, warning=FALSE, message=FALSE, cache=TRUE }
 theps <- replicate(1000,getPvalues())
+theps[,1:5]
 ```
 
 ## Example 1: Randomization Assessment
@@ -199,7 +203,6 @@ apply(theps,1,function(x){ mean(x<=.05) })
 ## Example 2: Pre-registration
 
 We pre-register that we will look at the effect of the treatment moderated by X1:
-
 ```{r}
 lm1 <- lm(Y~Z*X1,data=dat)
 lm1ci <- coefci(lm1,vcov=vcovHC(lm1,type="HC2"))
@@ -254,6 +257,9 @@ assessPs <- function(newZ){
 ```
 
 ## Example 2: Pre-registration
+
+Notice that we could have similar kinds of issues with covariance adjustment and not moderating effects.
+
 
 ```{r cache=TRUE}
 res <- replicate(1000,assessPs(newZ=complete_ra(N=50,m=15)))
