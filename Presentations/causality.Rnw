@@ -309,7 +309,7 @@ mean(thedist >= theobs)
 
 \begin{frame}[allowframebreaks]
         \bibliographystyle{apsr}
-        \bibliography{../BIB/big}
+        \bibliography{../../Research-Group-Bibliography/big}
 \end{frame}
 
 \end{document}
