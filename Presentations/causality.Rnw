@@ -1,9 +1,9 @@
 \documentclass[10pt,ignorenonframetext]{beamer}
 
 
-<<include=FALSE,cache=FALSE>>=
+`r include=FALSE,cache=FALSE}
 opts_chunk$set(tidy=FALSE,echo=FALSE,results='markup',fig.path='figs/fig',cache=FALSE,highlight=TRUE,width.cutoff=132,size='footnotesize',out.width='1.2\\textwidth',message=FALSE,comment=NA)
-@
+```
 
 \usepackage{bowers-beamer}
 \graphicspath{{.}{../images/}}
@@ -19,8 +19,8 @@ opts_chunk$set(tidy=FALSE,echo=FALSE,results='markup',fig.path='figs/fig',cache=
 
 \institute[Illinois]{
   %\inst{1}
-  Political Science \& Statistics \& NCSA @ University of Illinois
-  {jwbowers@illinois.edu   --- \href{http://jakebowers.org}{http://jakebowers.org} }
+  Political Science \& Statistics \& NCSA ``` University of Illinois
+  {jwbowers```illinois.edu   --- \href{http://jakebowers.org}{http://jakebowers.org} }
 }
 
 \renewcommand{\bibsection}{\subsection*{References}}
@@ -186,11 +186,11 @@ and wide-spread association.
 		\textbf{know}} \only<2->{\textbf{potential outcomes} ($\text{causal effect}_i=f(y_{i,1},y_{i,0})$})?
 
 
-<<readdata, echo=FALSE>>=
+```{r readdata, echo=FALSE}
 newsdf <- read.csv("../Data/news.csv")
-@
+```
 
-<<setupnewsdesigntab,echo=FALSE>>=
+```{r setupnewsdesigntab,echo=FALSE}
 newsdf$y1 <- ifelse(newsdf$z==1,newsdf$r,"?")
 newsdf$y0 <- ifelse(newsdf$z==0,newsdf$r,"?")
 
@@ -206,9 +206,9 @@ newspapers.xtab<-xtable(newsdf[,c("city","s","z","rpre","r","Newspaper","y1","y0
 			$y_{0}$ for control.  \\citet{pana2006}
 			provides more detail on the design of the experiment.",
 			align=c("l","l","c","c","c","c","c","c","c"))
-@
+```
 
-<<newsdesigntab,results='asis',echo=FALSE>>=
+```{r newsdesigntab,results='asis',echo=FALSE}
 print(newspapers.xtab,
       sanitize.text.function=function(x){x},include.rownames=FALSE,include.colnames=FALSE,
       table.placement="!ht",##size="small",
@@ -220,7 +220,7 @@ print(newspapers.xtab,
 		      \\multicolumn{1}{c}{$y_{1}$} &
 		      \\multicolumn{1}{c}{$y_{0}$}\\\\"),
       hline.after=c(0,nrow(newspapers.xtab)))
-@
+```
 
 \only<3>{\textbf{\emph{Small group exercise:}} \textbf{Can you think of
 		\textcolor{orange}{more than one way} to learn about the
@@ -251,16 +251,16 @@ Definition of a p-value. What does it mean?
 \begin{frame}[containsverbatim,shrink]
   \frametitle{Estimating an Average Treatment Effect}
 
-<<>>=
+```{r }
 options(width=132)
-@
+```
 
-<<estate,echo=TRUE,results='markup',highlight=TRUE,tidy=FALSE,tidy.opts=list(width.cutoff=130)>>=
+```{r estate,echo=TRUE,results='markup',highlight=TRUE,tidy=FALSE,tidy.opts=list(width.cutoff=130)}
 Z <- c(0,1,0,1)
 Y <- c(16,22,7,14)
 estate <- mean(Y[Z==1]) - mean(Y[Z==0]) ## same as coef(lm(Y~Z))["Z"]
 estate
-@
+```
 
 \end{frame}
 
@@ -269,11 +269,11 @@ estate
 \begin{frame}[containsverbatim,shrink]
   \frametitle{Testing the Sharp Null of No Effects}
 
-<<>>=
+```{r }
 options(width=132)
-@
+```
 
-<<sharpnulltest,echo=TRUE,results='markup',highlight=TRUE,tidy=FALSE,tidy.opts=list(width.cutoff=130)>>=
+```{r sharpnulltest,echo=TRUE,results='markup',highlight=TRUE,tidy=FALSE,tidy.opts=list(width.cutoff=130)}
 Om <- matrix(0,ncol=choose(4,2),nrow=length(Z)) ## All possible experiments
 whotrted <- combn(1:4,2)
 for(i in 1:choose(4,2)){ Om[cbind(whotrted[,i],i)]<-1 }
@@ -283,7 +283,7 @@ rbind(Om,thedist)
 table(thedist)
 theobs <- meandifftz(Y,Z)
 mean(thedist >= theobs)
-@
+```
 
 \end{frame}
 
