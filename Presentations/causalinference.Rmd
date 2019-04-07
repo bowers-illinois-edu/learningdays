@@ -1,0 +1,353 @@
+---
+title: Introducing Counterfactual Causal Inference
+author: Jake Bowers and EGAP Learning Days Instructors
+bibliography: ../../Research-Group-Bibliography/big.bib
+date: 8 April 2019 --- Bogot\'{a}
+output: 
+  bookdown::html_document2:
+    number_sections: true
+    toc: true
+    theme: journal
+    extensions: +implicit_figure
+    code_folding: hide
+    fig_caption: true
+    pandoc_args: [
+           --filter, pandoc-crossref
+        ]
+---
+
+
+\newcommand{\bX}{\mathbf{X}}
+\newcommand{\bZ}{\mathbf{Z}}
+\newcommand{\bz}{\mathbf{z}}
+\newcommand{\bbeta}{\boldsymbol{\beta}}
+\newcommand{\bSigma}{\boldsymbol{\Sigma}}
+
+```{r include=FALSE,cache=FALSE}
+opts_chunk$set(tidy=FALSE,echo=FALSE,results='markup',fig.path='figs/fig',cache=FALSE,highlight=TRUE,width.cutoff=132,size='footnotesize',out.width='1.2\\textwidth',message=FALSE,comment=NA)
+```
+
+\usepackage{bowers-beamer}
+\graphicspath{{.}{../images/}}
+\newcommand{\framen}[1]{\frame{#1 \note{ }}}
+
+
+\section{What might ``cause'' \textbf{mean}?: Definitions and Conceptualization}
+
+\begin{frame}
+	\frametitle{Some of my recent causal questions}
+
+	Did \href{https://youtu.be/RgYIGLNdy9I}{a new Hausa television station} in northern Nigeria change
+	attitudes about violence, the role of women in society, or the role
+	of youth in society?
+
+	%Award winning soap opera that is supposed to change behavior
+
+	\only<2>{
+	\centering \includegraphics[width=.7\textwidth]{Arewa_pic1.png}}
+
+	\medskip
+
+	Will adding education counselors to public housing in the USA increase
+	the numbers of low
+	income youth enrolled in post-secondary education (like university)
+	and receiving financial aid for their education?
+
+	\only<3>{
+	\centering \includegraphics[width=.4\textwidth]{hudamps.pdf}}
+
+	%Did a \href{https://vine.co/v/ibQ1KIIadve}{short video message} from Michelle Obama increase college
+	%attendence among low income youth in the USA?
+
+	\medskip
+
+	Did the UKIP (anti-immigrant) party in the UK influence how individuals
+	\textbf{see} the ethnic characteristics of their communities?
+
+	\only<4>{
+	\centering \includegraphics[width=.5\textwidth]{beslondonmaps.pdf}}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{What are we doing when we talk about causation?}
+
+Social science and government as connected conversations.
+
+Social scientists working with humility and openness to convince themselves about mechanisms and laws (explanations). When many agree then we call it the "scientific consensus".  (Humility and openness means that we are not mostly trying to sell our favorite story about the world, but to learn about how the world works, to start by admitting that we don't understand everything, to search for and embrace lack of understanding.
+
+Input to the conversation are attempts to persuade ourselves. Some contributions persuade more and some are easier to argue against. Are there guides to more or less persuasive contributions? (Yes. The creation of those guides is its own conversation and is the study of research design, methodology, statistics, philosophy and psychology).
+
+We practice the design of persuasive research a lot in academia because we are all working to contribute to the consensus.
+
+A growing movement in government aims to adapt the constant learning model from science to help manage the increasing speed of social, cultural, and economic and climate related change. So, more and more policy-experts are adding social science expertise --- in terms of both substance and methods of persuasive contribution.
+
+I think that I am mostly trying to persuade myself rather than necessarily others. 
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Why not just talk about correlation and association?}
+
+Why the interest in causal inference?
+
+\end{frame}
+
+\begin{frame}
+	\frametitle{What does ``cause'' mean?}
+
+When someone says ``$X$ causes $Y$'' they might mean:
+
+\begin{description}
+	\item[Persistent association]<1-> ``We always/mostly see $Y=1$ when $X=1$
+		and $Y=0$ when $X=0$.''
+	\item[Counterfactual Difference]<2-> ``If  $X$ had not been this value, then $Y$
+		would not have been that value.''
+	\item[Difference after manipulation]<3-> ``When we change $X$ from one
+		value to another value, then $Y$ changes from one value to
+		another value.'' (establishes causal
+		priority of $X$ over $Y$, implied that $Y$ would not have changed.).
+	\item[Difference after operation of a mechanism]<4-> ``Once upon a
+		time $A$ changed $X$, and then one day $X$ changed $B$, and
+		because of that $B$
+		changed $C$, and finally $C$ changed $Y$.''
+	\item[other\ldots]
+\end{description}
+
+%\only<5->{Most randomized experiments combine the manipulation and counterfactual definitions.}
+
+
+\only<6->{Difference research designs help us \textbf{make the case} for a
+	\textbf{claim} that ``$X$ causes $Y$'' more or less strongly given
+different conceptualizations.
+
+\medskip
+
+Often, \textbf{experiments} aim to \textbf{manipulate} (\textbf{by
+randomization}) parts of
+expected/theoretical mechanisms to reveal counter-factuals rather than aim to document persistent
+and wide-spread association.
+
+}
+
+	\vfill
+
+\footnotesize{
+\emph{Extra:} If you want to dig into this see \citet{brady2008cae}.
+\url{http://egap.org/resources/guides/causality/}
+}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{A few common misconceptions about counterfactual causal explanations}
+
+Overall: "X causes Y" is short hand.
+Overall: We can learn about whether, and how, X causes Y, without having a full story about how Y takes on values in the world.
+Overall: "what is the cause of Y" tends to have a simple answer "a lot of things"! 
+
+\begin{itemize}
+\item "X causes Y" need not imply that W and V do not cause Y. "X causes Y" just means that X is a part of the story, not the whole story. (The whole story is not necessary in order to learn about whether X causes Y).
+\item We can establish that X causes Y without knowing mechanism. The mechanism can be complex, it can involve probability: X causes Y sometimes because of A and sometimes because of B. 
+\item Counterfactual causation does not require "spatiotemporally continuous sequence of causal intermediates". \cite{holland86}: Person A plans event Y. Person B's action would stop Y (say, a random bump from a stranger). Person C doesn't know about Person A or action Y but stops B (maybe thinks B is going to trip). So, Person A does action Y. And Person C causes action Y (without Person C's action, Y would not have occurred). 
+\item "X causes Y" can mean "With X, probability of Y is higher than would be without X." or "Without X there is no Y." Either is compatible with the counterfactual idea.
+\item Correlation is not causation: Favorite examples? 
+\item "X causes Y" requires a \textbf{context}: matches cause flame but require oxygen; small classrooms improve test scores but require experienced teachers and funding.
+\item "X causes Y" is a statement about what didn't happen: "If X had not operated, occurred, then Y would not have occurred." (More about the fundamental problem of counterfactual causation later)
+
+\end{itemize}
+
+\end{frame}
+
+\section{Why randomize?}
+
+\begin{frame}
+	\frametitle{Observational studies vs. Randomized studies}
+
+	\textbf{Discuss in small groups:}  Help me design the next project to
+	answer one of these questions (or one of your own causal questions):
+
+	\smallskip
+
+Questions:
+- Can edutainment (like the Hausa TV Station or radio programs currently being used in Niger) can change attitudes about violence and extermism?
+- Does telling low-SES parents about the number of words they speak to their infants and toddlers  improve early language aquisition in this group (reducing inequality in early verbal skills and eventually reducing inequality in school readiness at age 5)? 
+- Your own question?
+
+	\begin{enumerate}
+
+		\item What would be an ideal observational study design? (no
+randomization, no researcher control but infinite resources for data
+collection) What questions would critical readers ask when you claim that your
+results reflect a causal relationship?
+
+\item What would be an ideal experimental study design? (including
+	randomization and control)  What questions would critical readers ask when you claim that your
+	results reflect a causal relationship?
+\end{enumerate}
+
+\end{frame}
+
+\section{Why randomize?}
+
+\begin{frame}
+	\frametitle{Why randomize?}
+
+	Randomization produces \textbf{fair} comparisons (ex. impersonal, no
+	systematic differences between groups).
+
+	Randomization helps us reason about information/uncertainty: \\
+
+	\begin{verse}
+	Q: ``What does this $p$-value mean?" \\
+	A: ``It is the probability of seeing a result as extreme as
+	\textcolor{orange}{this} in the world of the null hypothesis." \\
+	Q: ``What do you mean by \textcolor{blue}{probability} or `world of
+	the null hypothesis'"?
+\end{verse}
+
+
+\end{frame}
+
+
+
+\section{Overview of Statistical Inference for Causal Quantities}
+
+\begin{frame}[shrink]
+	\frametitle{Counterfactual Causal \textcolor{orange}{Inference}}
+
+	How can we use what we \textbf{see} to learn about \only<1>{what we want to
+		\textbf{know}} \only<2->{\textbf{potential outcomes} ($\text{causal effect}_i=f(y_{i,1},y_{i,0})$})?
+
+
+```{r readdata, echo=FALSE}
+newsdf <- read.csv("../Data/news.csv")
+```
+
+```{r setupnewsdesigntab,echo=FALSE}
+newsdf$y1 <- ifelse(newsdf$z==1,newsdf$r,"?")
+newsdf$y0 <- ifelse(newsdf$z==0,newsdf$r,"?")
+
+library(xtable)
+
+newspapers.xtab<-xtable(newsdf[,c("city","s","z","rpre","r","Newspaper","y1","y0")],
+			label="tab:newspapers",
+			caption="Design and outcomes in the Newspapers Experiment.
+			The Treatment column shows treatment randomized
+			within pair with the
+			newspaper ads as 1 and lack of treatment as 0. The
+			potential outcomes are $y_{1}$ for treatment and
+			$y_{0}$ for control.  \\citet{pana2006}
+			provides more detail on the design of the experiment.",
+			align=c("l","l","c","c","c","c","c","c","c"))
+```
+
+```{r newsdesigntab,results='asis',echo=FALSE}
+print(newspapers.xtab,
+      sanitize.text.function=function(x){x},include.rownames=FALSE,include.colnames=FALSE,
+      table.placement="!ht",##size="small",
+      add.to.row=list(pos=list(-1),
+		      command="&&& \\multicolumn{2}{c}{Turnout} \\\\ City &
+		      Pair & Treatment & \\multicolumn{1}{c}{Baseline} &
+		      \\multicolumn{1}{c}{Outcome} &
+		      \\multicolumn{1}{c}{Newspaper} &
+		      \\multicolumn{1}{c}{$y_{1}$} &
+		      \\multicolumn{1}{c}{$y_{0}$}\\\\"),
+      hline.after=c(0,nrow(newspapers.xtab)))
+```
+
+\only<3>{\textbf{\emph{Small group exercise:}} \textbf{Can you think of
+		\textcolor{orange}{more than one way} to learn about the
+		counterfactual causal effect of treatment using what we
+		observe from an experiment?}}
+
+\end{frame}
+
+Definition of a p-value. What does it mean?
+
+\begin{frame}
+  \frametitle{What is the true effect of the treatment assignment?}
+
+  \only<1>{
+    \includegraphics[width=.8\textwidth]{cartoonNeymanBayesFisherCropped.pdf} }
+  \only<2>{ \includegraphics[width=.8\textwidth]{cartoon3ATENeyman.pdf} }
+  \only<3>{ \includegraphics[width=.8\textwidth]{cartoonBayes.pdf} }
+  \only<4>{ \includegraphics[width=.8\textwidth]{cartoon4Fisher.pdf} }
+
+\vfill
+
+  \only<5->{See also \citet{pearl:2000a} and also
+	  \cite{richardson2013single}. For more on the potential outcomes
+	  approach see \cite{imbens2015causal}. }
+
+\end{frame}
+
+\begin{frame}[containsverbatim,shrink]
+  \frametitle{Estimating an Average Treatment Effect}
+
+```{r }
+options(width=132)
+```
+
+```{r estate,echo=TRUE,results='markup',highlight=TRUE,tidy=FALSE,tidy.opts=list(width.cutoff=130)}
+Z <- c(0,1,0,1)
+Y <- c(16,22,7,14)
+estate <- mean(Y[Z==1]) - mean(Y[Z==0]) ## same as coef(lm(Y~Z))["Z"]
+estate
+```
+
+\end{frame}
+
+
+
+\begin{frame}[containsverbatim,shrink]
+  \frametitle{Testing the Sharp Null of No Effects}
+
+```{r }
+options(width=132)
+```
+
+```{r sharpnulltest,echo=TRUE,results='markup',highlight=TRUE,tidy=FALSE,tidy.opts=list(width.cutoff=130)}
+Om <- matrix(0,ncol=choose(4,2),nrow=length(Z)) ## All possible experiments
+whotrted <- combn(1:4,2)
+for(i in 1:choose(4,2)){ Om[cbind(whotrted[,i],i)]<-1 }
+meandifftz <- function(y,z){ mean(y[z==1]) - mean(y[z==0]) }
+thedist<-apply(Om,2, function(z){ meandifftz(Y,z) })
+rbind(Om,thedist)
+table(thedist)
+theobs <- meandifftz(Y,Z)
+mean(thedist >= theobs)
+```
+
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{What do we need to interpret our calculations as teaching
+		about causal quantities?}
+
+	\only<1->{For the sharp null test: Randomization occurred as
+	reported.}
+
+	%% INCLUDE SLIDE FROM YALE TALK ON INTERFERENCE AND SHARP NULL
+
+	\medskip
+
+	\only<2->{For the average treatment effect: Randomization occurred
+		as reported plus no interference between units.}
+
+\end{frame}
+
+\section{Later: Weaknesses of randomized experiments.}
+
+
+\begin{frame}[allowframebreaks]
+        \bibliographystyle{apsr}
+        \bibliography{../BIB/big}
+\end{frame}
+
+\end{document}
+
+%%% Local Variables:
+%%% TeX-master: "causality.tex"
+%%% End:
