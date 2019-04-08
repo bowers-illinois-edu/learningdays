@@ -3,7 +3,7 @@ title: Introducing Counterfactual Causal Inference
 author: Jake Bowers and EGAP Learning Days Instructors
 institute: University of Illinois @ Urbana-Champaign among other affiliations
 bibliography: ../../Research-Group-Bibliography/big.bib
-date: 8 April 2019 --- Bogot\'{a}
+date: 8 April 2019 --- Bogotá
 header-includes: \graphicspath{{.}{../images/}}
 output:
   binb::metropolis:
@@ -49,13 +49,13 @@ Did the UKIP (anti-immigrant) party in the UK influence how individuals
 
 ## What are we doing when we talk about causation?
 
-I think that we are trying **build evidence** for explanations.
+I think that social scientists try to work collectively to **build evidence** for explanations. So: we make individual contributions, we try to persuade ourselves that we have learned something, we correct our past misunderstandings, etc.
 
-Good evidence persuades --- it is harder to argue against.
+Strong evidence persuades --- it is harder to argue against than weak evidence.
 
 Randomized experiments, we'll show, are especially persuasive about explanations involving **cause** in very focused ways. 
 
-"[The experimenter's] aim is to draw valid conclusions of _determinate precision and generality_ from the evidence..." (Joan Fisher Box in Pearl's *Book of Why*). 
+"[The experimenter's] aim is to draw valid conclusions of _determinate precision and generality_ from the evidence..." (Joan Fisher Box quoted in \citet{pearl2018book})
 
 \note{
 The scientific consensus is like an ever changing conversation. 
@@ -76,12 +76,12 @@ I think that I am mostly trying to persuade myself rather than necessarily other
 
 Why the growing interest in *causal* inference rather than *population* inference or *measurement* inference?
 
-My answer: Humanity needs a kind of engineering turn within part of the social sciences. (like a doubling of the size of the social sciences, maintaining the same focus on theory and basic research but adding an engineering style branch).
+My answer: Humanity needs a kind of engineering turn within part of the social sciences because of the growth in "How" questions: "How can we make government work better? How can we deliver development aid better?" 
 
 Moving from "Why" to "How" involves the need to know about the effects of causes.
 
-See the growth of EGAP, J-PAL, Behavioral Insights teams, the Evidence-Based Policy Movement, etc... 
-
+For examples of this move:  EGAP, J-PAL, Behavioral Insights teams, the
+Evidence-Based Policy Movement, McKinsey, Deloitte and see \citep{bowerstesta2019epp}.
 
 ## What does ``cause'' mean?
 
@@ -103,6 +103,8 @@ When someone says ``$X$ causes $Y$'' they might mean:
 	\item[other\ldots]
 \end{description}
 
+## What does ``cause'' mean?
+
 Often, \textbf{experiments} aim to \textbf{manipulate} (\textbf{by
 randomization}) parts of
 expected/theoretical mechanisms to reveal counter-factuals rather than aim to document persistent
@@ -117,33 +119,39 @@ This week we will be focusing on the counterfactual approach because we focusing
 
 ## How to interpret "X causes Y"?
 
- -  "X causes Y" need not imply that W and V do not cause Y. "X causes Y" just
-    means that X is a part of the story, not the whole story. (The whole story
+\begin{itemize}
+ \item  "X causes Y" need not imply that W and V do not cause Y: X is a part of the story, not the whole story. (The whole story
 is not necessary in order to learn about whether X causes Y).
- -  We can establish that X causes Y without knowing mechanism. The mechanism
-    can be complex, it can involve probability: X causes Y sometimes because of
-A and sometimes because of B. 
- - Counterfactual causation does not require "spatiotemporally continuous
-   sequence of causal intermediates". \cite{holland:1986}: Person A plans event
+  \item Counterfactual causation does not require "spatiotemporally continuous
+   sequence of causal intermediates" ex: Person A plans event
 Y. Person B's action would stop Y (say, a random bump from a stranger). Person
 C doesn't know about Person A or action Y but stops B (maybe thinks B is going
 to trip). So, Person A does action Y. And Person C causes action Y (without
-Person C's action, Y would not have occurred). 
- - "X causes Y" can mean "With X, probability of Y is higher than would be
+Person C's action, Y would not have occurred).  \citep{holland:1986} 
+ \item "X causes Y" requires a \textbf{context}: matches cause flame but require
+   oxygen; small classrooms improve test scores but require experienced
+teachers and funding \citep{cartwright2012evidence}.
+\end{itemize}
+
+
+## How to interpret "X causes Y"?
+
+\begin{itemize}
+\item   We can establish that X causes Y without knowing mechanism. The mechanism
+    can be complex, it can involve probability: X causes Y sometimes because of
+A and sometimes because of B. 
+ \item "X causes Y" can mean "With X, probability of Y is higher than would be
    without X." or "Without X there is no Y." Either is compatible with the
 counterfactual idea.
- - Correlation is not causation: Favorite examples? 
- - "X causes Y" requires a \textbf{context}: matches cause flame but require
-   oxygen; small classrooms improve test scores but require experienced
-teachers and funding (Cartwright).
- - "X causes Y" is a statement about what didn't happen: "If X had not
+ \item Correlation is not causation: Favorite examples? 
+ \item "X causes Y" is a statement about what didn't happen: "If X had not
    operated, occurred, then Y would not have occurred." (More about the
 fundamental problem of counterfactual causation later)
-
+\end{itemize}
 
 # Randomization for Interpretable Comparisons and Clarity about Uncertainty
 
-## Observational studies vs. Randomized studies
+## Exercise: Observational studies vs. Randomized studies
 
 **Discuss in small groups:**  Help me design the next project to answer
 one of these questions (or one of your own causal questions). Just sketch the
@@ -153,6 +161,8 @@ key features of two designs --- one observational and the other randomized.
 
   - Can edutainment (like the Hausa TV Station or radio programs currently being used in Niger) can change attitudes about violence and extermism?
   - Does telling low-SES parents about the number of words they speak to their infants and toddlers  improve early language aquisition in this group (reducing inequality in early verbal skills and eventually reducing inequality in school readiness at age 5)? 
+
+## Exercise: Observational studies vs. Randomized studies
 
 **Tasks:**
   1. Sketch an ideal observational study design? (no
@@ -170,7 +180,7 @@ systematic differences between groups).
 
 Randomization helps us reason about information/uncertainty. 
 
-> "Fisher realized that an uncertain answer to the right question is much better than a highly certain answer to the wrong question...If you ask the right question, getting an answer that is occasionally wrong is much less of a problem [than answers to the wrong question]. You can still estimate the amount of uncertainty in your answer, because the uncertainty comes from the randomization procedure (which is known) rather than the characteristics of the soil (which are unknown)." (Pearl, *book of why*)
+> "Fisher realized that an uncertain answer to the right question is much better than a highly certain answer to the wrong question...If you ask the right question, getting an answer that is occasionally wrong is much less of a problem [than answers to the wrong question]. You can still estimate the amount of uncertainty in your answer, because the uncertainty comes from the randomization procedure (which is known) rather than the characteristics of the soil (which are unknown)." \citep{pearl2018book}
 
 
 # Overview of Statistical Inference for Causal Quantities
