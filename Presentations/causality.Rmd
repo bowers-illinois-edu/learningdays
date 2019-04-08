@@ -17,8 +17,49 @@ output:
 \newcommand{\bSigma}{\boldsymbol{\Sigma}}
 
 
-```{r, include=FALSE}
-options(tinytex.verbose = TRUE)
+
+
+```{r include=FALSE, cache=FALSE}
+# Some customization.  You can alter or delete as desired (if you know what you are doing).
+# knitr settings to control how R chunks work.
+rm(list=ls())
+
+require(knitr)
+
+## This plus size="\\scriptsize" from https://stackoverflow.com/questions/26372138/beamer-presentation-rstudio-change-font-size-for-chunk
+
+knitr::knit_hooks$set(mysize = function(before, options, envir) {
+  if (before)
+    return(options$size)
+})
+
+knit_hooks$set(plotdefault = function(before, options, envir) {
+    if (before) par(mar = c(3, 3, .1, .1),oma=rep(0,4),mgp=c(1.5,.5,0))
+})
+
+opts_chunk$set(
+  tidy=FALSE,     # display code as typed
+  echo=TRUE,
+  results='markup',
+  strip.white=TRUE,
+  fig.path='figs/fig',
+  cache=FALSE,
+  highlight=TRUE,
+  width.cutoff=132,
+  size='\\scriptsize',
+  out.width='.8\\textwidth',
+  fig.retina=FALSE,
+  message=FALSE,
+  comment=NA,
+  mysize=TRUE,
+  plotdefault=TRUE)
+
+if(!file.exists('figs')) dir.create('figs')
+
+options(digits=4,
+	scipen=8,
+	width=132
+	)
 ```
 
 
@@ -242,7 +283,7 @@ print(newspapers.xtab,
 Definition of a p-value. What does it mean?
 
 
-## What is the true effect of the treatment assignment?}
+## What is the true effect of the treatment assignment?
 
   \only<1>{
     \includegraphics[width=.8\textwidth]{cartoonNeymanBayesFisherCropped.pdf} }
@@ -257,7 +298,7 @@ Definition of a p-value. What does it mean?
 	  approach see \cite{imbens2015causal}. }
 
 
-## Estimating an Average Treatment Effect}
+## Estimating an Average Treatment Effect
 
 ```{r }
 options(width=132)
@@ -274,7 +315,7 @@ estate
 
 ## Testing the Sharp Null of No Effects
 
-```{r }
+```{r echo=FALSE}
 options(width=132)
 ```
 
