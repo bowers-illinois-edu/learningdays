@@ -159,36 +159,40 @@ key features of two designs --- one observational and the other randomized.
 
 **Possible research questions:**
 
-  - Can edutainment (like the Hausa TV Station or radio programs currently being used in Niger) can change attitudes about violence and extermism?
-  - Does telling low-SES parents about the number of words they speak to their infants and toddlers  improve early language aquisition in this group (reducing inequality in early verbal skills and eventually reducing inequality in school readiness at age 5)? 
+  - Can edutainment (like the Hausa TV Station or radio programs currently
+    being used in Niger) change attitudes about violence and extermism?
+    (Goal: Reduce violence and extremism.)
+  - Does information about words spoken  to  infants/toddlers  improve early
+    language aquisition in this group? (Goal:  reduce inequality in early verbal
+    skills and eventually reducing inequality in school readiness at age 5)
 
 ## Exercise: Observational studies vs. Randomized studies
 
 **Tasks:**
-  1. Sketch an ideal observational study design? (no
-randomization, no researcher control but infinite resources for data
-collection) What questions would critical readers ask when you claim that your
-results reflect a causal relationship?
-  2. Sketch an ideal experimental study design? (including
-	randomization and control)  What questions would critical readers ask when you claim that your
-	results reflect a causal relationship?
+
+  1. Sketch an ideal observational study design? (no randomization, no
+     researcher control but infinite resources for data collection) What
+     questions would critical readers ask when you claim that your results
+     reflect a causal relationship?
+
+  2. Sketch an ideal experimental study design? (including randomization and
+     control)  What questions would critical readers ask when you claim that
+     your results reflect a causal relationship?
 
 ## Why randomize?
 
-Randomization produces \textbf{fair} comparisons (ex. impersonal, no
-systematic differences between groups).
+  1. Randomization produces \textbf{fair} comparisons (ex. impersonal, no
+     systematic differences between groups).
 
-Randomization helps us reason about information/uncertainty. 
+  2. Randomization helps us reason about information/uncertainty. 
 
 > "Fisher realized that an uncertain answer to the right question is much better than a highly certain answer to the wrong question...If you ask the right question, getting an answer that is occasionally wrong is much less of a problem [than answers to the wrong question]. You can still estimate the amount of uncertainty in your answer, because the uncertainty comes from the randomization procedure (which is known) rather than the characteristics of the soil (which are unknown)." \citep{pearl2018book}
 
 
-# Overview of Statistical Inference for Causal Quantities
-
-## Counterfactual Causal \textcolor{orange}{Inference}}
+## Using randomization to reason about causal \textcolor{orange}{Inference}
 
 How can we use what we \textbf{see} to learn about \only<1>{what we want to
-\textbf{know}} \only<2->{\textbf{potential outcomes} ($\text{causal effect}_i=f(y_{i,1},y_{i,0})$})?
+\textbf{know}} \only<2->{\textbf{potential outcomes} ($\text{causal effect}_i=f(y_{i,1},y_{i,0})$}?
 
 
 ```{r readdata, echo=FALSE}
@@ -216,10 +220,11 @@ newspapers.xtab<-xtable(newsdf[,c("city","s","z","rpre","r","Newspaper","y1","y0
 ```{r newsdesigntab,results='asis',echo=FALSE}
 print(newspapers.xtab,
       sanitize.text.function=function(x){x},include.rownames=FALSE,include.colnames=FALSE,
-      table.placement="!ht",##size="small",
+      table.placement="!ht",size="small",
+      comment=FALSE,
       add.to.row=list(pos=list(-1),
 		      command="&&& \\multicolumn{2}{c}{Turnout} \\\\ City &
-		      Pair & Treatment & \\multicolumn{1}{c}{Baseline} &
+		      Pair & Treat & \\multicolumn{1}{c}{Baseline} &
 		      \\multicolumn{1}{c}{Outcome} &
 		      \\multicolumn{1}{c}{Newspaper} &
 		      \\multicolumn{1}{c}{$y_{1}$} &
@@ -289,10 +294,6 @@ mean(thedist >= theobs)
 
 \only<1->{For the sharp null test: Randomization occurred as
 reported.}
-
-%% INCLUDE SLIDE FROM YALE TALK ON INTERFERENCE AND SHARP NULL
-
-\medskip
 
 \only<2->{For the average treatment effect: Randomization occurred
 	as reported plus no interference between units.}
