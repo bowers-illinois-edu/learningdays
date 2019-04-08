@@ -30,24 +30,15 @@ Did \href{https://youtu.be/RgYIGLNdy9I}{a new Hausa television station} in
 northern Nigeria change attitudes about violence, the role of women in
 society, or the role of youth in society?
 
-
 \only<2>{
 \centering \includegraphics[width=.7\textwidth]{Arewa_pic1.png}}
 
-\medskip
-
-Will adding education counselors to public housing in the USA increase
-the numbers of low
-income youth enrolled in post-secondary education (like university)
-and receiving financial aid for their education?
+Will adding education counselors to public housing in the USA increase the
+numbers of low income youth enrolled in post-secondary education (like
+university) and receiving financial aid for their education?
 
 \only<3>{
 \centering \includegraphics[width=.4\textwidth]{hudamps.pdf}}
-
-%Did a \href{https://vine.co/v/ibQ1KIIadve}{short video message} from Michelle Obama increase college
-%attendence among low income youth in the USA?
-
-\medskip
 
 Did the UKIP (anti-immigrant) party in the UK influence how individuals
 \textbf{see} the ethnic characteristics of their communities?
@@ -58,8 +49,18 @@ Did the UKIP (anti-immigrant) party in the UK influence how individuals
 
 ## What are we doing when we talk about causation?
 
-Social science and government as connected conversations.
+I think that we are trying **build evidence** for explanations.
 
+Good evidence persuades --- it is harder to argue against.
+
+Randomized experiments, we'll show, are especially persuasive about explanations involving **cause** in very focused ways. 
+
+"[The experimenter's] aim is to draw valid conclusions of _determinate precision and generality_ from the evidence..." (Joan Fisher Box in Pearl's *Book of Why*). 
+
+\note{
+The scientific consensus is like an ever changing conversation. 
+
+Social science and government as connected conversations.
 Social scientists working with humility and openness to convince themselves about mechanisms and laws (explanations). When many agree then we call it the "scientific consensus".  (Humility and openness means that we are not mostly trying to sell our favorite story about the world, but to learn about how the world works, to start by admitting that we don't understand everything, to search for and embrace lack of understanding.
 
 Input to the conversation are attempts to persuade ourselves. Some contributions persuade more and some are easier to argue against. Are there guides to more or less persuasive contributions? (Yes. The creation of those guides is its own conversation and is the study of research design, methodology, statistics, philosophy and psychology).
@@ -69,11 +70,18 @@ We practice the design of persuasive research a lot in academia because we are a
 A growing movement in government aims to adapt the constant learning model from science to help manage the increasing speed of social, cultural, and economic and climate related change. So, more and more policy-experts are adding social science expertise --- in terms of both substance and methods of persuasive contribution.
 
 I think that I am mostly trying to persuade myself rather than necessarily others. 
-
+}
 
 ## Why not just talk about correlation and association?
 
-Why the interest in causal inference?
+Why the growing interest in *causal* inference rather than *population* inference or *measurement* inference?
+
+My answer: Humanity needs a kind of engineering turn within part of the social sciences. (like a doubling of the size of the social sciences, maintaining the same focus on theory and basic research but adding an engineering style branch).
+
+Moving from "Why" to "How" involves the need to know about the effects of causes.
+
+See the growth of EGAP, J-PAL, Behavioral Insights teams, the Evidence-Based Policy Movement, etc... 
+
 
 ## What does ``cause'' mean?
 
@@ -95,102 +103,82 @@ When someone says ``$X$ causes $Y$'' they might mean:
 	\item[other\ldots]
 \end{description}
 
-%\only<5->{Most randomized experiments combine the manipulation and counterfactual definitions.}
-
-
-\only<6->{Difference research designs help us \textbf{make the case} for a
-	\textbf{claim} that ``$X$ causes $Y$'' more or less strongly given
-different conceptualizations.
-
-\medskip
-
 Often, \textbf{experiments} aim to \textbf{manipulate} (\textbf{by
 randomization}) parts of
 expected/theoretical mechanisms to reveal counter-factuals rather than aim to document persistent
 and wide-spread association.
 
-}
-
-	\vfill
+This week we will be focusing on the counterfactual approach because we focusing on experiments. It is not that we think it is wrong to _conceptualize_ "cause" in any other way. But that it has been productive to use the counterfactual approach.
 
 \footnotesize{
 \emph{Extra:} If you want to dig into this see \citet{brady2008cae}.
 \url{http://egap.org/resources/guides/causality/}
 }
 
+## How to interpret "X causes Y"?
+
+ -  "X causes Y" need not imply that W and V do not cause Y. "X causes Y" just
+    means that X is a part of the story, not the whole story. (The whole story
+is not necessary in order to learn about whether X causes Y).
+ -  We can establish that X causes Y without knowing mechanism. The mechanism
+    can be complex, it can involve probability: X causes Y sometimes because of
+A and sometimes because of B. 
+ - Counterfactual causation does not require "spatiotemporally continuous
+   sequence of causal intermediates". \cite{holland:1986}: Person A plans event
+Y. Person B's action would stop Y (say, a random bump from a stranger). Person
+C doesn't know about Person A or action Y but stops B (maybe thinks B is going
+to trip). So, Person A does action Y. And Person C causes action Y (without
+Person C's action, Y would not have occurred). 
+ - "X causes Y" can mean "With X, probability of Y is higher than would be
+   without X." or "Without X there is no Y." Either is compatible with the
+counterfactual idea.
+ - Correlation is not causation: Favorite examples? 
+ - "X causes Y" requires a \textbf{context}: matches cause flame but require
+   oxygen; small classrooms improve test scores but require experienced
+teachers and funding (Cartwright).
+ - "X causes Y" is a statement about what didn't happen: "If X had not
+   operated, occurred, then Y would not have occurred." (More about the
+fundamental problem of counterfactual causation later)
 
 
-
-## A few common misconceptions about counterfactual causal explanations
-
-Overall: "X causes Y" is short hand.
-Overall: We can learn about whether, and how, X causes Y, without having a full story about how Y takes on values in the world.
-Overall: "what is the cause of Y" tends to have a simple answer "a lot of things"! 
-
-\begin{itemize}
-\item "X causes Y" need not imply that W and V do not cause Y. "X causes Y" just means that X is a part of the story, not the whole story. (The whole story is not necessary in order to learn about whether X causes Y).
-\item We can establish that X causes Y without knowing mechanism. The mechanism can be complex, it can involve probability: X causes Y sometimes because of A and sometimes because of B. 
-\item Counterfactual causation does not require "spatiotemporally continuous sequence of causal intermediates". \cite{holland:1986}: Person A plans event Y. Person B's action would stop Y (say, a random bump from a stranger). Person C doesn't know about Person A or action Y but stops B (maybe thinks B is going to trip). So, Person A does action Y. And Person C causes action Y (without Person C's action, Y would not have occurred). 
-\item "X causes Y" can mean "With X, probability of Y is higher than would be without X." or "Without X there is no Y." Either is compatible with the counterfactual idea.
-\item Correlation is not causation: Favorite examples? 
-\item "X causes Y" requires a \textbf{context}: matches cause flame but require oxygen; small classrooms improve test scores but require experienced teachers and funding.
-\item "X causes Y" is a statement about what didn't happen: "If X had not operated, occurred, then Y would not have occurred." (More about the fundamental problem of counterfactual causation later)
-
-\end{itemize}
-
-
-
-# Why randomize?
-
+# Randomization for Interpretable Comparisons and Clarity about Uncertainty
 
 ## Observational studies vs. Randomized studies
 
-	\textbf{Discuss in small groups:}  Help me design the next project to
-	answer one of these questions (or one of your own causal questions):
+**Discuss in small groups:**  Help me design the next project to answer
+one of these questions (or one of your own causal questions). Just sketch the
+key features of two designs --- one observational and the other randomized.
 
-	\smallskip
+**Possible research questions:**
 
-Questions:
   - Can edutainment (like the Hausa TV Station or radio programs currently being used in Niger) can change attitudes about violence and extermism?
   - Does telling low-SES parents about the number of words they speak to their infants and toddlers  improve early language aquisition in this group (reducing inequality in early verbal skills and eventually reducing inequality in school readiness at age 5)? 
-  - Your own question?
 
-Tasks:
-  1. What would be an ideal observational study design? (no
+**Tasks:**
+  1. Sketch an ideal observational study design? (no
 randomization, no researcher control but infinite resources for data
 collection) What questions would critical readers ask when you claim that your
 results reflect a causal relationship?
-  2. What would be an ideal experimental study design? (including
+  2. Sketch an ideal experimental study design? (including
 	randomization and control)  What questions would critical readers ask when you claim that your
 	results reflect a causal relationship?
 
-
-# Why randomize?
-
-
 ## Why randomize?
 
-	Randomization produces \textbf{fair} comparisons (ex. impersonal, no
-	systematic differences between groups).
+Randomization produces \textbf{fair} comparisons (ex. impersonal, no
+systematic differences between groups).
 
-	Randomization helps us reason about information/uncertainty: \\
+Randomization helps us reason about information/uncertainty. 
 
-	\begin{verse}
-	Q: ``What does this $p$-value mean?" \\
-	A: ``It is the probability of seeing a result as extreme as
-	\textcolor{orange}{this} in the world of the null hypothesis." \\
-	Q: ``What do you mean by \textcolor{blue}{probability} or `world of
-	the null hypothesis'"?
-\end{verse}
+> "Fisher realized that an uncertain answer to the right question is much better than a highly certain answer to the wrong question...If you ask the right question, getting an answer that is occasionally wrong is much less of a problem [than answers to the wrong question]. You can still estimate the amount of uncertainty in your answer, because the uncertainty comes from the randomization procedure (which is known) rather than the characteristics of the soil (which are unknown)." (Pearl, *book of why*)
 
 
 # Overview of Statistical Inference for Causal Quantities
 
-[shrink]
-	## Counterfactual Causal \textcolor{orange}{Inference}}
+## Counterfactual Causal \textcolor{orange}{Inference}}
 
-	How can we use what we \textbf{see} to learn about \only<1>{what we want to
-		\textbf{know}} \only<2->{\textbf{potential outcomes} ($\text{causal effect}_i=f(y_{i,1},y_{i,0})$})?
+How can we use what we \textbf{see} to learn about \only<1>{what we want to
+\textbf{know}} \only<2->{\textbf{potential outcomes} ($\text{causal effect}_i=f(y_{i,1},y_{i,0})$})?
 
 
 ```{r readdata, echo=FALSE}
@@ -254,9 +242,7 @@ Definition of a p-value. What does it mean?
 	  approach see \cite{imbens2015causal}. }
 
 
-
-[containsverbatim,shrink]
-  ## Estimating an Average Treatment Effect}
+## Estimating an Average Treatment Effect}
 
 ```{r }
 options(width=132)
@@ -291,15 +277,19 @@ mean(thedist >= theobs)
 
 ## What do we need to interpret our calculations as teaching about causal quantities?
 
-	\only<1->{For the sharp null test: Randomization occurred as
-	reported.}
+\only<1->{For the sharp null test: Randomization occurred as
+reported.}
 
-	%% INCLUDE SLIDE FROM YALE TALK ON INTERFERENCE AND SHARP NULL
+%% INCLUDE SLIDE FROM YALE TALK ON INTERFERENCE AND SHARP NULL
 
-	\medskip
+\medskip
 
-	\only<2->{For the average treatment effect: Randomization occurred
-		as reported plus no interference between units.}
+\only<2->{For the average treatment effect: Randomization occurred
+	as reported plus no interference between units.}
 
+
+# Weaknesses of RCTs (To Discuss)
+
+## Weaknesses of RCTs (To Discuss)
 
 # References
