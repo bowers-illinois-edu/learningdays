@@ -1,6 +1,6 @@
 ---
 title: "Herramientas clave para el diseño y análisis de experimentos en R"
-author: "Bogotá, Colombia - Abril, 2018"
+author: "Bogotá, Colombia - Abril, 2019"
 date: "Día 2: Pruebas de hipótesis"
 subtitle: EGAP - Learning Days
 output:
