@@ -281,7 +281,7 @@ t.test(treated, not_treated, alternative="two.sided") # dos colas
 
 ```
 
-##Randomization Inference  
+##Randomization Inference para la hipotesis estricta 
 
 Recordemos que la hipótesis nula ESTRICTA (a.k.a., *Sharp Null*) en RI es: 
 $$H_0: y_i(1) - y_i(0) = 0$$ 
