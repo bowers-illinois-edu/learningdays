@@ -8,11 +8,16 @@ header-includes: \graphicspath{{.}{../images/}}
 output:
   binb::metropolis:
     citation_package: natbib    
-    keep_tex: true
-    slide_level: 2
-    includes:
-      in_header: slidespreamble.tex
 ---
+
+\newcommand{\bX}{\mathbf{X}}
+\newcommand{\bZ}{\mathbf{Z}}
+\newcommand{\bz}{\mathbf{z}}
+\newcommand{\bbeta}{\boldsymbol{\beta}}
+\newcommand{\bSigma}{\boldsymbol{\Sigma}}
+
+
+
 
 ```{r include=FALSE, cache=FALSE}
 # Some customization.  You can alter or delete as desired (if you know what you are doing).
@@ -42,7 +47,7 @@ opts_chunk$set(
   highlight=TRUE,
   width.cutoff=132,
   size='\\scriptsize',
-  out.width='.8\\textwidth',
+  out.width='.95\\textwidth',
   fig.retina=FALSE,
   message=FALSE,
   comment=NA,
@@ -57,16 +62,14 @@ options(digits=4,
 	)
 ```
 
-\begin{frame}{Key Points for this lecture}
+# Overview
+
+## Key Points for this lecture
 
 Statistical inference (e.g. Hypothesis tests and confidence
 intervals) is \textbf{inference} --- reasoning about the unobserved.
 
-\medskip
-
 $p$-values require probability distributions.
-
-\medskip
 
 \textcolor{blue}{Randomization} (or Design) +
 \textcolor{orange}{a Hypothesis} + \textcolor{green}{a Test Statistic
@@ -74,7 +77,11 @@ Function} can provide
 probability distributions representing the hypothesis (and thus
 $p$-values).
 
-\end{frame}
+## Using randomization to reason about causal \textcolor{orange}{Inference}
+
+How can we use what we \textbf{see} to learn about \only<1>{what we want to
+\textbf{know}} \only<2->{\textbf{potential outcomes} ($\text{causal effect}_i=f(y_{i,1},y_{i,0})$}?
+
 
 ```{r readdata, echo=FALSE}
 newsdf <- read.csv("../Data/news.csv")
@@ -98,19 +105,14 @@ newspapers.xtab<-xtable(newsdf[,c("city","s","z","rpre","r","Newspaper","y1","y0
 			align=c("l","l","c","c","c","c","c","c","c"))
 ```
 
-\begin{frame}{Inferring about Causal Effects}
-
-How can we use what we \textbf{see} to learn about
-\only<1>{what we want to \textbf{know}} \only<3>{$\text{a causal effect}_i=f(y_{i,1},y_{i,0})$} \only<2>{\textbf{\textcolor{blue}{potential outcomes}}}?
-
 ```{r newsdesigntab,results='asis',echo=FALSE}
 print(newspapers.xtab,
       sanitize.text.function=function(x){x},include.rownames=FALSE,include.colnames=FALSE,
-      table.placement="!ht",
+      table.placement="!ht",size="small",
       comment=FALSE,
       add.to.row=list(pos=list(-1),
 		      command="&&& \\multicolumn{2}{c}{Turnout} \\\\ City &
-		      Pair & Treatment & \\multicolumn{1}{c}{Baseline} &
+		      Pair & Treat & \\multicolumn{1}{c}{Baseline} &
 		      \\multicolumn{1}{c}{Outcome} &
 		      \\multicolumn{1}{c}{Newspaper} &
 		      \\multicolumn{1}{c}{$y_{1}$} &
@@ -118,522 +120,383 @@ print(newspapers.xtab,
       hline.after=c(0,nrow(newspapers.xtab)))
 ```
 
-\only<3>{\textbf{\emph{Small group exercise:}} \textbf{Can you think of \textcolor{orange}{more than one way} to learn about the counterfactual causal effect of treatment using what we observe?}}
-\end{frame}
+\only<3>{\textbf{\emph{Small group exercise:}} \textbf{Can you think of
+		\textcolor{orange}{more than one way} to learn about the
+		counterfactual causal effect of treatment using what we
+		observe from an experiment?}}
 
-\section{Definition of a p-value. What does it mean?}
 
-\begin{frame}
-  \frametitle{What is the true effect of the treatment assignment?}
+## What is the true effect of the treatment assignment?
 
-  \only<1>{ \includegraphics[width=.8\textwidth]{cartoonNeymanBayesFisherCropped.pdf} }
+  \only<1>{
+    \includegraphics[width=.8\textwidth]{cartoonNeymanBayesFisherCropped.pdf} }
   \only<2>{ \includegraphics[width=.8\textwidth]{cartoon3ATENeyman.pdf} }
   \only<3>{ \includegraphics[width=.8\textwidth]{cartoonBayes.pdf} }
   \only<4>{ \includegraphics[width=.8\textwidth]{cartoon4Fisher.pdf} }
 
-\end{frame}
+
+## Ingredients of a hypothesis test
+
+ - A **hypothesis** is a statement about a relationship among potential outcomes (Strong or Weak)
+ - A **test statistic** summarizes the relationship between treatment and
+   observed outcomes.
+ - The **design** allows us to link the hypothesis and the test statistic:
+   calculate a test statistic that describes a relationship between potential
+   outcomes.
+ - The **design** also generates a distribution of possible test statistics
+   implied by the hypothesis
+ - A $p$-value describes the relationship between our observed test statistic
+   and the possible hypothesized test statistics
 
 
-# Testing Fishers Sharp Null Hypothesis of No Effects: Where do $p$-values come from?
-
-
-
-\begin{frame}[containsverbatim,allowframebreaks,shrink]
-  \frametitle{Testing the Sharp Null of No Effects Practically}
-  \framesubtitle{Ingredients: Hypothesis, Test Statistic Function, Distribution}
-
-```{r }
-options(width=132)
+```{r setup, echo=FALSE}
 library(randomizr)
+library(coin)
 ```
 
-```{r sharpnulltest1,echo=TRUE,results='markup',highlight=TRUE,tidy=FALSE,tidy.opts=list(width.cutoff=130)}
-newexperiment <- function(block){
-	block_ra(blocks=block)
-}
-
-testStat1 <- function(y,z,b){
-	## Diff of means
-  ## y is outcome
-  ## z is treatment (binary here)
-  ## b is block
-  if(length(unique(b))==1){
-    ## if only one block, then this is a simple mean difference
-    return(mean(y[z==1]) - mean(y[z==0]))
-  } else {
-    z <- z[order(b)]
-    ys <- y[order(b)]
-    ysdiffs <- ys[z==1] - ys[z==0]  ## assuming sorted by pair
-    meandiffs <- mean(ysdiffs)
-    return(meandiffs)
-  }
-}
-
-
-testStat2 <- function(y,z,b){
-	## Diff of mean ranks
-  ## y is outcome
-  ## z is treatment (binary here)
-  ## b is block
-  y <- rank(y) ##
-  if(length(unique(b))==1){
-    ## if only one block, then this is a simple mean difference
-    return(mean(y[z==1]) - mean(y[z==0]))
-  } else {
-    z <- z[order(b)]
-    ys <- y[order(b)]
-    ysdiffs <- ys[z==1] - ys[z==0]  ## assuming sorted by pair
-    meandiffs <- mean(ysdiffs)
-    return(meandiffs)
-  }
-}
-```
-
-\end{frame}
-
-
-\begin{frame}[containsverbatim,allowframebreaks]
-  \frametitle{Testing the Sharp Null of No Effects Practically}
-  \framesubtitle{Ingredients: Hypothesis, Test Statistic Function, Distribution}
-
-  The probability distribution implied by the hypothesis is generated by
-  repeating the experiment.
-
-```{r sharpnulltest1ps,echo=TRUE,results='markup',highlight=TRUE,tidy=FALSE,tidy.opts=list(width.cutoff=130)}
-obsTestStat1 <- with(newsdf,testStat1(y=r,z=z,b=sF))
-obsTestStat2 <- with(newsdf,testStat2(y=r,z=z,b=sF))
+```{r echo=FALSE}
+## First, create some data, 
+##  y0 is potential outcome to control
+N <- 10
+y0 <- c(0,0,0,1,1,3,4,5,190,200)
+## Different individual level treatment effects
+tau <- c(10,30,200,90,10,20,30,40,90,20)
+## y1 is potential outcome to treatment
+y1 <- y0 + tau
+#sd(y0)
+#mean(y1)-mean(y0)
+# mean(tau)
+## Z is treatment assignment
 set.seed(12345)
-refDistNull1 <- replicate(1000,with(newsdf,testStat1(y=r,z=newexperiment(b=sF),b=sF)))
-refDistNull2 <- replicate(1000,with(newsdf,testStat2(y=r,z=newexperiment(b=sF),b=sF)))
-
-p1SideMean <- mean(refDistNull1>=obsTestStat1)
-p1SideRank<-mean(refDistNull2>=obsTestStat2)
-p2SideMean<-2*min(mean(refDistNull1>=obsTestStat1),mean(refDistNull1<=obsTestStat1))
-p2SideRank <- 2*min(mean(refDistNull2>=obsTestStat2),mean(refDistNull2<=obsTestStat2))
-p2SideRank
-p2SideMean
+Z <- complete_ra(N)
+## Y is observed outcomes
+Y <- Z*y1 + (1-Z)*y0
+## The data
+dat <- data.frame(Y=Y,Z=Z,y0=y0,tau=tau,y1=y1)
+dat$Ybin <- as.numeric(dat$Y > 100)
+#dat
+#pvalue(oneway_test(Y~factor(Z),data=dat,distribution=exact(),alternative="less"))
+#pvalue(wilcox_test(Y~factor(Z),data=dat,distribution=exact(),alternative="less"))
 ```
 
-\end{frame}
+## A hypothesis is a statement about or model of a relationship between potential outcomes
 
-
-\begin{frame}
-	\frametitle{}
-
-	Hypotheses+Design imply difference observations (identity...)
-
-\end{frame}
-
-
-\begin{frame}[containsverbatim]
-	\frametitle{Mean Difference Test Statistic}
-
-	 $H_0: y_{i1}=y_{i0}$, One-sided $p=6/16=.375$.
-
-\centering
-\includegraphics[width=.8\textwidth]{newspapersRandDist1.pdf}
-
-```{r echo=TRUE}
-6/16
-p1SideMean
+```{r}
+kable(dat)
 ```
 
-
-\end{frame}
-
+For example, the sharp, or strong, null hypothesis of no effects is $H_0: y_{i,1} = y_{i,0}$
 
 
-\begin{frame}[containsverbatim]
-	\frametitle{Different Test Statistics Summarize Information
-	Differently}
+## Test statistics summarize treatment to outcome relationships
 
-	- Power differences. Sensitivity to different alternatives.
+```{r}
+## The mean difference test statistic
+meanTZ <- function(ys,z){ 
+	mean(ys[z==1]) - mean(ys[z==0])
+}
 
-  \centering
-```{r echo=FALSE, out.width=".6\\textwidth"}
-plot(density(refDistNull2),xlim=range(c(refDistNull1,refDistNull2)))
-rug(jitter(refDistNull2),line= -1,lwd=2)
-lines(density(refDistNull1),lty=2)
-rug(jitter(refDistNull1),line=.5,lwd=2)
-abline(v=obsTestStat2)
-abline(v=obsTestStat1)
+## The difference of mean ranks test statistic
+meanrankTZ <- function(ys,z){
+	ranky <- rank(ys)
+	mean(ranky[z==1]) - mean(ranky[z==0])
+}
+
+observedMeanTZ <- meanTZ(ys=Y,z=Z)
+observedMeanRankTZ <- meanrankTZ(ys=Y,z=Z)
+observedMeanTZ
+observedMeanRankTZ
 ```
 
-\end{frame}
+## Linking test statistic and hypothesis.
 
-# Testing Sharp Hypotheses No Effects and No Interference
+What we observe for each person, $i$, ($Y_i$) is either what we would have
+observed in treatment ($y_{i,1}$) **or** what we would have observed in
+control ($y_{i,0}$).
 
-\begin{frame}
-  \frametitle{Statistical inference for counterfactual quantities with interference?}
+$$Y_i = Z_i y_{i,1} + (1-Z_i)* y_{i,0}$$
 
-  \centering
-  \includegraphics{complete-graph.pdf}
+So, if $y_{i,1}=y_{i,0}$ then:  $Y_i = y_{i,0}$: What we actually observe is
+what we would have observed in the control condition.
 
-  \only<1>{
+## Generating the distribution of hypothetical test statistics
 
-    \includegraphics[width=.95\textwidth]{interference-example.pdf}
+We need to know how to repeat our experiment:
 
-  }
-
-  \only<2>{
-    \includegraphics[width=.95\textwidth]{interference-example-2.pdf}
-
-    Introducing the \textbf{uniformity trial} $\equiv \by_{i,0000}$
-    (Rosenbaum, 2007).
-  }
-
-
-\end{frame}
-
-
-# Aspects of the approach: The tests do not require asymptopia.
-
-\begin{frame}[containsverbatim,shrink]
-	\frametitle{Permutations vs Central Limit Theorem?}
-
-	Which distribution should we use? Which $p$-value is better? (On what
-	basis would we judge a $p$-value?)
-
-```{r lmps,echo=TRUE,results='markup',highlight=TRUE,tidy=FALSE,tidy.opts=list(width.cutoff=130)}
-lmpvalue <- summary(lm(r~z+sF,data=newsdf))$coef["z",4]
-lmpvalue
-p2SideMean
-```
-
-(1) False positive rate
-
-(2) Power
-
-\end{frame}
-
-
-\begin{frame}
-	\frametitle{Permutations vs Central Limit Theorem?: False Positive
-	Rate}
-
-\centering
-\only<1>{\includegraphics[width=.95\textwidth]{newspapersTDist.pdf} }
-\only<2>{\includegraphics[width=.95\textwidth]{newspapersTypeIError.pdf} }
-
-\end{frame}
-
-
-\begin{frame}[containsverbatim,shrink]
-	\frametitle{What about when samples are large?}
-
-	\begin{columns}[t]
-		\begin{column}{.5\textwidth}
-```{r largeN, echo=TRUE}
-set.seed(20180225)
-N <- 1000
-y0 <- rchisq(N,df=1)
-y1 <- y0 + rnorm(N,mean=0,sd=sd(y0))## No treatment effect but different variance
-Z <- complete_ra(N) ## very simple randomization
-Y <- Z*y1 + (1-Z) * y0 ## randomization reveals a potential outcome
-
-newexpComplete <- function(N){
+```{r}
+repeatExperiment <- function(N){
 	complete_ra(N)
 }
-
-testStat3 <- function(y,z){
-	## Diff of means
-  ## y is outcome
-  ## z is treatment (binary here)
-    md <- mean(y[z==1]) - mean(y[z==0])
-    return(md)
-  }
-
-obsTestStat <- testStat3(y=Y,z=Z)
-randDist <- replicate(1000,testStat3(y=Y,z=newexpComplete(N)))
-mean(randDist >= obsTestStat)
-2* min( mean(randDist >= obsTestStat), mean(randDist <= obsTestStat))
 ```
 
-```{r }
-library(sandwich)
-library(lmtest)
+Then  we repeat it,  calculating the implied test statistic each time:
 
-thelm <- lm(Y~Z)
-theSEs <- coeftest(thelm,vcov=vcovHC(thelm,type="HC2"))
-theSEs[2,4]
-```
-\end{column}
-\begin{column}{.5\textwidth}
-
-Notice heteroskedasticity.
-
-```{r }
- boxplot(list(y0,y1))
+```{r reps, cache=TRUE}
+set.seed(123456)
+possibleMeanDiffsH0 <- replicate(10000,meanTZ(ys=Y,z=repeatExperiment(N=10)))
+set.seed(123456)
+possibleMeanRankDiffsH0 <- replicate(10000,meanrankTZ(ys=Y,z=repeatExperiment(N=10)))
 ```
 
+## Plot the randomization distributions under the null
 
-```{r }
-plot(density(randDist))
-curve(dnorm(x,sd=theSEs[2,2],mean=0),from=-1,to=1,col="blue", add=TRUE)
+```{r fig.cap="An example of using the design of the experiment to test a hypothesis.", results='asis', echo=FALSE, fig.align='center'}
+par(mfrow=c(1,2),mgp=c(1.5,.5,0),mar=c(3,3,0,0),oma=c(0,0,3,0))
+plot(density(possibleMeanDiffsH0),
+     ylim=c(0,.04),
+     xlim=range(possibleMeanDiffsH0),
+     lwd=2,
+     main="",#Mean Difference Test Statistic",
+     xlab="Mean Differences Consistent with H0")
+rug(possibleMeanDiffsH0)
+rug(observedMeanTZ,lwd=3,ticksize = .51)
+text(observedMeanTZ-4,.022,"Observed Test Statistic")
+
+plot(density(possibleMeanRankDiffsH0),lwd=2,
+     ylim=c(0,.45),
+     xlim=c(-10,10), #range(possibleMeanDiffsH0),
+     main="", #Mean Difference of Ranks Test Statistic",
+     xlab="Mean Difference of Ranks Consistent with H0")
+rug(possibleMeanRankDiffsH0)
+rug(observedMeanRankTZ,lwd=3,ticksize = .9)
+text(observedMeanRankTZ,.45,"Observed Test Statistic")
+
+mtext(side=3,outer=TRUE,text=expression(paste("Distributions of Test Statistics Consistent with the Design and ",H0: y[i1]==y[i0])))
 ```
 
-\end{column}
-\end{columns}
-
-\end{frame}
-
-# What is a $p$-value? What does a $p$-value require?
-
-\begin{frame}
-	\frametitle{What does it mean to test a hypothesis?}
-
-	What is a $p$-value?
-
-	\medskip
-
-	What do we learn from a hypothesis test?
-
-	\medskip
-
-	What do we need to assume to make a hypothesis test (in this simplest
-	case) interpretable?
-
-\end{frame}
-
-\appendix
-\section{Summary and Discussion}
-
-
-\begin{frame}
-\frametitle{Why test a hypothesis? What is a hypothesis?}
-
-(1) In an experiment a hypothesis is a claim or model about the relationship among potential
-outcomes; about unobserved outcomes.
-
-(2) In an experiment a hypothesis test allows a form of causal inference (or statistical
-inference about a counterfactual causal effect)
-
-\end{frame}
-
-\begin{frame}
-	\frametitle{Where does the reference distribution come from? What
-	justifies it?}
-
-How to make a distribution? Where do they come from? How do we justify our
-choices?
-
-In an experiment we have the opportunity to use randomization to provide a
-"reasoned basis for inference". That is, we know how randomization happened.
-And the specific randomization could have happened differently (different
-units could have been in treatment and control depending on the random process).
-
-
-
-
-\end{frame}
-
-\begin{frame}
-	\frametitle{Key features of Fisher's approach}
-
-	\begin{description}
-		\item[Flexible] Any scientific model than can generate
-			implications for all units' potential outcomes can, in
-			principle, produce testable parameters.
-		\item[Design based] Requires knowledge of probability of $Z$
-			not $Y$ or $Y|X$ or $\beta|\gamma$.
-		\item[Finite Sample Oriented] Does not require asymptopia. Can
-			use asymptopia when there for a visit.
-		\item[Can be slow] In between 8 cities and asymptopia is a
-			land of many permutations.
-		\item[Probably conservative] Uses relatively little of the
-			total information we have available about the science.
-	\end{description}
-
-	\textcolor{orange}{If you want to know more read Paul Rosenbaum's work}
-	The version of Fisher's approach I discuss here is built on work by Paul
-	Rosenbaum. Read his work if you want to learn more.
-
-\end{frame}
-
-
-
-\begin{frame}[allowframebreaks]
-        \bibliographystyle{apsr}
-        \bibliography{../BIB/big}
-\end{frame}
-
-\section{Extra}
-
-\subsection{Sharp Hypotheses of Some Effects. Sharp Hypotheses as Causal Models}
-
-\subsubsection{The Constant Additive Effect Model}
-
-\begin{frame}
-	\frametitle{What range of effects might be surprising?}
-
-	\begin{description}
-		\item[Hypothesize a model of potential outcomes]
-	For $H_0: y_{i1} = y_{i0} + \tau$, what $\tau$ might be surprising?
-
-\item[Map the model to observation via design] What would $\tau=6$ imply for
-	what we observe? If $\tau=6$ and $Y_i = Z_i y_{i1} + (1-Z_i) y_{i0}$
-	then $Y_i - Z_i 6 = y_{i0}$.
-
-\item[Generate the randomization distribution of this hypothesis] As before
-\item[Summarize information against the hypothesis] For hypotheses of $\tau
-	\ge 6$ we have $p \le .125$  using a mean difference test
-	statistic.
-\end{description}
-
-\centering
-\includegraphics[width=.7\textwidth]{newspapersFig3.pdf}
-
-\end{frame}
-
-\begin{frame}
-	\frametitle{What effects might be least surprising?}
-
-	The idea of a ``best guess'' maps onto the Hodges-Lehmann point
-	estimate: the hypotheses for which $E(t(Z,Y)=0$: ex. the difference of
-	means is zero. Here $\tau=1.5$ for the mean difference and
-	$\tau=3.25$ for the rank-based test (which equalizes medians).
-
-\centering
-\includegraphics[width=.9\textwidth]{newspapersHLAdj.pdf}
-
-\end{frame}
-
-\begin{frame}
-	\frametitle{Theoretical models of potential outcomes can produce sharp
-	hypotheses}
-
-
-\centering
-\only<1>{ \includegraphics[width=.9\textwidth]{fishersutvaNetwork.pdf} }
-\only<2>{ \includegraphics[width=.9\textwidth]{fishersutvaModel.pdf} }
-\only<3>{ \includegraphics[width=.9\textwidth]{fishersutvaResults.pdf} }
-
-
-
-\end{frame}
-
-\begin{frame}{A General Fisherian Inference Algorithm}
-  \begin{enumerate}
-    \item Write a model ($\HH(\yu, \bz, \theta)$) converting uniformity trial
-      into observed data (i.e. a causal model).
-    \item Solve for $\yu$: $\HH(\by_\bz, \bzero, \theta_0) = \yu$
-    \item Select a test statistic that is effect increasing in all relevant
-	    dimensions.
-    \item Compute $p$-values for substantively meaningful range of $\theta$.
-	    Or calculate boundaries of regions.
-  \end{enumerate}
-
-
-  \note{So, let me just summarize our workflow --- which, for those of you
-    familiar with Rosenbaum's approach to Fisher's hypothesis testing, will be
-    very familiar.}
-
-\end{frame}
-
-
-\subsection{Information arises from both theory and instruments}
-
-\begin{frame}
-	\frametitle{Robust test statistics can increase power.}
-
-	For the simple mean difference test statistic, we have $p=.375$, for a
-	rank sum test (the sum of the ranks of the treated units), we have a
-	$p=.4375$, and for an M-estimator based test (like mean-differences
-	but with weights roughly inversely proportional to the
-	Cook's $D$ influence measure) we have $p=.3125$.
-
-	\centering
-	\includegraphics[width=.8\textwidth]{newspapersCooksD.pdf}
-
-\end{frame}
-
-\begin{frame}
-	\frametitle{Covariance adjusted tests can increase power.}
-
-	Using the difference pre-vs-post as the outcome (comparing treated
-	pre-vs-post with paired control pre-vs-post), and using the robust
-	test statistic for $H_0: y_{i1}=y_{i0}$ $p=4/16=.25$.
-
-	Using $e_i = (Y_i - Y_{i,t-1}) - (\hat{\beta}_0 + \hat{\beta}_1\text{pop} +
-	\hat{\beta}_2 \text{num candidates})$ and the robust test statistic to
-	test $H_0: y_{i1}=y_{i0}$  we have  $p=2/16=.125$.
-
-
-\end{frame}
-
-\end{document}
-
-
-
-\begin{frame}[containsverbatim] %,allowframebreaks]
-  \frametitle{Testing the Sharp Null of No Effects Exactly}
-
-```{r }
-options(width=132)
+## P-values summarize the plots
+
+```{r calcpvalues}
+pMeanTZ <- mean( possibleMeanDiffsH0 >= observedMeanTZ )
+pMeanRankTZ <- mean( possibleMeanRankDiffsH0 >= observedMeanRankTZ )
+pMeanTZ
+pMeanRankTZ
 ```
 
-```{r sharpnulltest1exact,echo=TRUE,results='markup',highlight=TRUE,tidy=FALSE,tidy.opts=list(width.cutoff=130)}
-Z <- c(0,1,0,1) ## Define treatment vector
-Y <- c(16,22,7,14) ## Define outcome vector
-## There are choose(4,2) ways to assign treatment
-## Make a matrix containing all of the ways to assign treatment
-Om <- matrix(0,ncol=choose(4,2),nrow=length(Z)) ## First fill with zeros
-whotrted <- combn(1:4,2) ## Generate indicators of who is treated
-for(i in 1:choose(4,2)){ Om[cbind(whotrted[,i],i)]<-1 }
+## How to do this in R.
 
-## Great a function to summarize the hypothesized
-## treatment to outcome relationship
-meandifftz <- function(y,z){ mean(y[z==1]) - mean(y[z==0]) }
-rankdifftz <- function(y,z){ q<-rank(y); mean(q[z==1]) - mean(q[z==0]) }
-## Apply the function to all possible experiments
-mdist<-apply(Om,2, function(z){ meandifftz(Y,z) })
-rdist<-apply(Om,2, function(z){ rankdifftz(Y,z) })
-rbind(Om,mdist,rdist)
-```
-
-\end{frame}
-
-\begin{frame}[containsverbatim]
-	\frametitle{continued}
-
-```{r sharpnulltest2,echo=TRUE,results='markup',highlight=TRUE,tidy=FALSE,tidy.opts=list(width.cutoff=130)}
-table(mdist)
-table(rdist)
-mobs <- meandifftz(Y,Z) ## observed value of test stat
-robs <- rankdifftz(Y,Z) ## observed value of test stat
-mean(mdist >= mobs) ## p-value
-mean(rdist >= robs) ## p-value
-```
-
-\end{frame}
-
-\begin{frame}[containsverbatim,shrink]
-	\frametitle{Faster Method}
-
-```{r installdevritools, eval=FALSE,echo=FALSE}
-## Only run this once
-if(!dir.exists("libraries")){ dir.create("libraries") }
-.libPaths("libraries") ## make the default place for libraries the local one
-installedpackages<-installed.packages()
-if(!any(installedpackages[,"Package"]=="devtools")) {
-  install.packages("devtools", repos="http://cran.rstudio.com")
-  ## system("touch libraries/RItools/INSTALLED")
-}
+```{r}
+## using the coin package
+library(coin)
+set.seed(12345)
+pMean2 <- pvalue(oneway_test(Y~factor(Z),data=dat,distribution=approximate(B=1000)))
+dat$rankY <- rank(dat$Y)
+pMeanRank2 <- pvalue(oneway_test(rankY~factor(Z),data=dat,distribution=approximate(B=1000)))
+pMean2
+pMeanRank2
+## using a development version of the RItools package 
 library(devtools)
-install_github("markmfredrickson/RItools@randomization-distribution",force=TRUE,lib="libraries")
+dev_mode()
+install_github("markmfredrickson/RItools@randomization-distribution")
+library(RItools)
+thedesignA <- simpleRandomSampler(total=N,z=dat$Z,b=rep(1,N))
+pMean4 <- RItest(y=dat$Y,z=dat$Z,samples=1000, test.stat= meanTZ ,
+		 sampler = thedesignA)
+pMeanRank4 <- RItest(y=dat$Y,z=dat$Z,samples=1000, test.stat= meanrankTZ ,
+		     sampler = thedesignA)
+pMean4
+pMeanRank4
+dev_mode()
 ```
 
-```{r sharpnulltest3,echo=TRUE,results='markup',highlight=TRUE,tidy=FALSE,tidy.opts=list(width.cutoff=130)}
-library(RItools,lib.loc="libraries") ## see fishersinference.Rnw to get the dev version
+## How to do this in R.
 
-## Specify design: only 1 block
-randomassignment<-simpleRandomSampler(z=Z,b=rep(1,4))
+```{r}
+## using the ri2 package
+library(ri2)
+thedesign <- declare_ra(N=N)
+pMean4 <- conduct_ri( Y ~ Z, declaration = thedesign, 
+		     sharp_hypothesis = 0, data = dat, sims = 1000)
+summary(pMean4)
+pMeanRank4 <- conduct_ri( rankY ~ Z, declaration = thedesign, 
+		     sharp_hypothesis = 0, data = dat, sims = 1000)
+summary(pMeanRank4)
+```
 
-meandiffTZ <- function(ys, z) {
-    mean(ys[!(!z)]) - mean(ys[!z])
+
+## Next topics:
+
+ - Testing weak null hypotheses $H_0: \bar{y}_{1} = \bar{y}_{0}$ 
+ - Rejecting null hypotheses (and making false positive and/or false negative
+   errors)
+ - Power of hypothesis tests
+ - Maintaining correct false positive error rates when testing more than one
+   hypothesis. 
+
+
+
+## Testing the weak null of no average effects
+
+The weak null hypothesis is a claim about aggregates, and is nearly always
+stated in terms of averages: $H_0: \bar{y}_{1} = \bar{y}_{0}$ The test
+statistic for this hypothesis nearly always is the difference of means (i.e.
+`meanTZ()` above.
+
+```{r}
+lm1 <- lm(Y~Z,data=dat)
+lm1P <- summary(lm1)$coef["Z","Pr(>|t|)"]
+ttestP1 <- t.test(Y~Z,data=dat)$p.value
+library(estimatr)
+ttestP2 <- difference_in_means(Y~Z,data=dat)
+c(lm1P, ttestP1, ttestP2$p.value)
+```
+
+Why is the OLS $p$-value different? What assumptions is it making?
+
+## Testing the weak null of no average effects
+
+```{r results='asis'}
+boxplot(Y~Z,data=dat)
+```
+
+
+## Testing the weak null of no average effects
+
+```{r}
+## By hand:
+varEstATE <- function(Y,Z){
+	var(Y[Z==1])/sum(Z) + var(Y[Z==0])/sum(1-Z)
 }
-
-meandifftest<-RItest(y=Y, z=Z, test.stat=meandiffTZ, sampler = randomassignment)
-meandifftest
+seEstATE <- sqrt(varEstATE(dat$Y,dat$Z))
+obsTStat <- observedMeanTZ/seEstATE
+c(observedTestStat=observedMeanTZ,stderror=seEstATE,tstat=obsTStat,
+  pval=2*min(pt(obsTStat,df=8,lower.tail = TRUE),
+	     pt(obsTStat,df=8,lower.tail = FALSE))
+  )
 ```
 
+## Rejecting hypotheses and making errors
+
+How should we interpret `r  pMeanTZ`? What about `r pMeanRankTZ`?
+
+What does it mean to "reject" $H_0: y_{i,1}=y_{i,2}$ at $\alpha=.05$?
+
+"In typical use, the level of the test [$\alpha$] is a promise about the
+test’s performance and the size is a fact about its performance..." (Rosenbaum
+2010, Glossary)
+
+## Decision imply errors
+
+If errors are necessary, how can we diagnose them? How to learn whether our
+hypothesis testing procedure might generate too many false positive errors?
+
+Diagnose by simulation:
+
+
+## Diagnosing false positive rates by simulation
+
+Across repetitions of the design:
+
+ - Create a true null hypothesis.
+ - Test the true null.
+ - The $p$-value should be large.
+
+The proportion of small $p$-values should be no larger than $\alpha$.
+
+
+## Diagnosing false positive rates by simulation
+
+Example with a binary outcome.
+
+```{r}
+collectPValues <- function(y,z){
+	## Make Y and Z have no relationship by re-randomizing Z
+	newz <- repeatExperiment(length(y))
+        thelm <- lm(y~newz,data=dat)
+	ttestP2 <- difference_in_means(y~newz,data=dat)
+	owP <- pvalue(oneway_test(y~factor(newz),distribution=exact()))
+	ranky <- rank(y)
+	owRankP <- pvalue(oneway_test(ranky~factor(newz),distribution=exact()))
+	return(c(lmp=summary(thelm)$coef["newz","Pr(>|t|)"],
+		 neyp=ttestP2$p.value[[1]],
+		 rtp=owP,
+		 rtpRank=owRankP))
+}
+```
+
+```{r fprdsim, cache=TRUE}
+set.seed(12345)
+pDist <- replicate(5000,collectPValues(y=dat$Ybin,z=dat$Z))
+```
+
+## Diagnosing false positive rates by simulation
+
+```{r}
+apply(pDist,1,table)
+```
+
+## Diagnosing false positive rates by simulation
+
+
+```{r}
+apply(pDist,1,function(x){ mean(x<.1)})
+apply(pDist,1,function(x){ mean(x<.25)})
+```
+
+
+## Diagnosing false positive rates by simulation
+
+```{r plotecdf, results='asis', echo=FALSE, message=FALSE, warning=FALSE}
+par(mfrow=c(1,1),mgp=c(1.25,.5,0),oma=rep(0,4),mar=c(3,3,0,0))
+plot(c(0,1),c(0,1),type="n",
+     xlab="p-value=p",ylab="Proportion p-values < p")
+for(i in 1:nrow(pDist)){
+	lines(ecdf(pDist[i,]),pch=i,col=i)
+}
+abline(0,1,col="gray")
+legend("topleft",legend=c("OLS","Neyman","Rand Inf Mean Diff","Rand Inf Mean Diff Ranks"),
+			  pch=1:5,col=1:5,lty=1,bty="n")
+
+
+```
+
+## Topics for later
+
+ - Power of tests
+
+## Summary:
+
+A good test (1) casts doubt on the truth rarely and (2)  easily
+   distinguishes signal from noise (casts doubt on falsehoods often).
+
+We can learn whether our testing procedure controls false positive rates given
+our design.
+
+When false positive rates are not controlled, what might be going wrong?
+(often has to do with asymptotics)
+
+
+## What else to know about hypothesis tests.
+
+Here we list a few other important but advanced topics connected to hypothesis
+testing:
+
+ - Even if a given testing procedure controls the false positive rate for a
+   single test, it may not control the rate for a group of multiple tests. See
+   [10 Things you need to know about multiple
+   comparisons](https://egap.org/methods-guides/10-things-you-need-know-about-multiple-comparisons)
+   for a guide to the approaches to controlling such rejection-rates in
+   multiple tests.
+ - A $100\alpha$\% confidence interval can be defined as the range of
+   hypotheses where all of the $p$-values are greater than or equal to
+   $\alpha$. This is called inverting the hypothesis test.
+   (@rosenbaum2010design). That is, a confidence interval is a collection of
+   hypothesis tests.
+ - A point estimate based on hypothesis testing is called a Hodges-Lehmann
+   point estimate. (@rosenbaum1993hlp,@hodges1963elb)
+
+## What else to know about hypothesis tests.
+
+ - A set of hypothesis tests can be combined into one single hypothesis test
+   (@hansen:bowers:2008,@caughey2017nonparametric)
+ - In equivalence testing, one can hypothesize that two test-statistics are
+   equivalent (i.e. the treatment group is the same as the control group)
+   rather than only about one test-statistic (the difference between the two
+   groups is zero) {@hartman2018equivalence}
+ - Since a hypothesis test is a model of potential outcomes, one can use
+   hypothesis testing to learn about complex models, such as models of
+   spillover and propagation of treatment effects across networks
+   (@bowers2013reasoning, @bowers2016research, @bowers2018models)
+
+
+# References
