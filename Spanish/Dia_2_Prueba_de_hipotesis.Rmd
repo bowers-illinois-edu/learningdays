@@ -304,7 +304,7 @@ choose(600,400)
 # 10.000 veces y solo nos quedamos con los vectores únicos (porque se pueden repetir):
 perm_matrix <- matrix(NA, 10000, 600)
 for (i in 1:10000){
-perm_matrix[i,] <- sample(data$complete.ra, 600, replace=F)
+  perm_matrix[i,] <- sample(data$complete.ra, 600, replace=F)
 }
 perm_matrix<-unique(perm_matrix)
 
@@ -314,7 +314,7 @@ dim(perm_matrix)
 # Ahora estimamos la diferencia de medias para cada posible aleatorización
 
 # Podemos usar un loop para esto: 
-rand_ate <- NA # Vector vacio para ir incluyendo los resultados
+rand_meandiff <- NA # Vector vacio para ir incluyendo los resultados
 for (i in 1:nrow(perm_matrix)){ # para cada uno de los vectores de tratamiento "falsos"
 
   mean_treat <- mean(data$complete.obs[perm_matrix[i,]==1])
@@ -322,15 +322,15 @@ for (i in 1:nrow(perm_matrix)){ # para cada uno de los vectores de tratamiento "
   mean_control <- mean(data$complete.obs[perm_matrix[i,]==0])
   
   # calculamos la diferencia de medias para esta aleatorización
-  rand_ate[i] <- mean_treat - mean_control
+  rand_meandiff[i] <- mean_treat - mean_control
   
 }
 
-summary(rand_ate) # vector de permuatación de diferencias
+summary(rand_meandiff) # vector de permuatación de diferencias
 
 # Podemos hacer una gráfica para ver mejor los resultados:
 
-hist(rand_ate, breaks=100, 
+hist(rand_meandiff, breaks=100, 
      main="Distribución de permutación",
      xlab= "Valor del estadístico de prueba (doms)",
      ylab = "Freq.", xlim=c(-5,5))
@@ -340,10 +340,10 @@ abline(v=diff.mean, lwd=3, col="slateblue")
 # ¿Cómo calculamos los p-valores en este contexto?
 
 # Una cola
-sum(rand_ate<=diff.mean)/length(rand_ate)
+sum(rand_meandiff<=diff.mean)/length(rand_meandiff)
 
 # Dos colas
-sum(abs(rand_ate)<=diff.mean)/length(rand_ate)
+sum(abs(rand_meandiff)<=diff.mean)/length(rand_meandiff)
 
 ```
 
