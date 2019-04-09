@@ -1,23 +1,18 @@
 ---
-title: What is a hypothesis test?
+title: What is a hypothesis test? Why test hypotheses?
 author: Jake Bowers and EGAP Learning Days Instructors
 institute: University of Illinois @ Urbana-Champaign among other affiliations
 bibliography: ../../Research-Group-Bibliography/big.bib
-date: 8 April 2019 --- Bogotá
+date: 9 April 2019 --- Bogotá
 header-includes: \graphicspath{{.}{../images/}}
 output:
   binb::metropolis:
     citation_package: natbib    
+    keep_tex: true
+    slide_level: 2
+    includes:
+      in_header: slidespreamble.tex
 ---
-
-\newcommand{\bX}{\mathbf{X}}
-\newcommand{\bZ}{\mathbf{Z}}
-\newcommand{\bz}{\mathbf{z}}
-\newcommand{\bbeta}{\boldsymbol{\beta}}
-\newcommand{\bSigma}{\boldsymbol{\Sigma}}
-
-
-
 
 ```{r include=FALSE, cache=FALSE}
 # Some customization.  You can alter or delete as desired (if you know what you are doing).
@@ -62,41 +57,30 @@ options(digits=4,
 	)
 ```
 
-\begin{frame}
-	\frametitle{Key Points}
+\begin{frame}{Key Points for this lecture}
 
-	Statistical inference (e.g. Hypothesis tests and confidence
-	intervals) is \textbf{inference} --- reasoning about the unobserved.
+Statistical inference (e.g. Hypothesis tests and confidence
+intervals) is \textbf{inference} --- reasoning about the unobserved.
 
-	\medskip
+\medskip
 
-	 $p$-values require probability distributions.
+$p$-values require probability distributions.
 
-	 \medskip
+\medskip
 
-	 \textcolor{blue}{Randomization} (or Design) +
-	 \textcolor{orange}{a Hypothesis} + \textcolor{green}{a Test Statistic
-	 Function} can provide
-	 probability distributions representing the hypothesis (and thus
-	 $p$-values).
+\textcolor{blue}{Randomization} (or Design) +
+\textcolor{orange}{a Hypothesis} + \textcolor{green}{a Test Statistic
+Function} can provide
+probability distributions representing the hypothesis (and thus
+$p$-values).
 
 \end{frame}
 
-\section{Review: Hypotheses and Counterfactual Causal Inference}
-
-\begin{frame}
-	\frametitle{Counterfactual Causal \textcolor{orange}{Inference}}
-
-	How can we use what we \textbf{see} to learn about
-	\only<1>{what we want to \textbf{know}} \only<3>{$\text{a causal effect}_i=f(y_{i,1},y_{i,0})$}
-	\only<2>{\textbf{\textcolor{blue}{potential outcomes}}}?
-
-
-<<readdata, echo=FALSE>>=
+```{r readdata, echo=FALSE}
 newsdf <- read.csv("../Data/news.csv")
-@
+```
 
-<<setupnewsdesigntab,echo=FALSE>>=
+```{r setupnewsdesigntab,echo=FALSE}
 newsdf$y1 <- ifelse(newsdf$z==1,newsdf$r,"?")
 newsdf$y0 <- ifelse(newsdf$z==0,newsdf$r,"?")
 
@@ -112,12 +96,18 @@ newspapers.xtab<-xtable(newsdf[,c("city","s","z","rpre","r","Newspaper","y1","y0
 			$y_{0}$ for control.  \\citet{pana2006}
 			provides more detail on the design of the experiment.",
 			align=c("l","l","c","c","c","c","c","c","c"))
-@
+```
 
-<<newsdesigntab,results='asis',echo=FALSE>>=
+\begin{frame}{Inferring about Causal Effects}
+
+How can we use what we \textbf{see} to learn about
+\only<1>{what we want to \textbf{know}} \only<3>{$\text{a causal effect}_i=f(y_{i,1},y_{i,0})$} \only<2>{\textbf{\textcolor{blue}{potential outcomes}}}?
+
+```{r newsdesigntab,results='asis',echo=FALSE}
 print(newspapers.xtab,
       sanitize.text.function=function(x){x},include.rownames=FALSE,include.colnames=FALSE,
-      table.placement="!ht",##size="small",
+      table.placement="!ht",
+      comment=FALSE,
       add.to.row=list(pos=list(-1),
 		      command="&&& \\multicolumn{2}{c}{Turnout} \\\\ City &
 		      Pair & Treatment & \\multicolumn{1}{c}{Baseline} &
@@ -126,16 +116,12 @@ print(newspapers.xtab,
 		      \\multicolumn{1}{c}{$y_{1}$} &
 		      \\multicolumn{1}{c}{$y_{0}$}\\\\"),
       hline.after=c(0,nrow(newspapers.xtab)))
-@
+```
 
-\only<3>{\textbf{\emph{Small group exercise:}} \textbf{Can you think of
-		\textcolor{orange}{more than one way} to learn about the
-		counterfactual causal effect of treatment using what we
-		observe?}}
-
+\only<3>{\textbf{\emph{Small group exercise:}} \textbf{Can you think of \textcolor{orange}{more than one way} to learn about the counterfactual causal effect of treatment using what we observe?}}
 \end{frame}
 
-Definition of a p-value. What does it mean?
+\section{Definition of a p-value. What does it mean?}
 
 \begin{frame}
   \frametitle{What is the true effect of the treatment assignment?}
@@ -145,17 +131,10 @@ Definition of a p-value. What does it mean?
   \only<3>{ \includegraphics[width=.8\textwidth]{cartoonBayes.pdf} }
   \only<4>{ \includegraphics[width=.8\textwidth]{cartoon4Fisher.pdf} }
 
-\vfill
-
-%%   \only<5->{See also \citet{pearl:2000a} and also
-%% 	  \cite{richardson2013single}. For more on the potential outcomes
-%% 	  approach see \cite{imbens2015causal}. }
-
 \end{frame}
 
 
-\section{Testing Fishers Sharp Null Hypothesis of No Effects: Where do
-$p$-values come from?}
+# Testing Fishers Sharp Null Hypothesis of No Effects: Where do $p$-values come from?
 
 
 
@@ -163,12 +142,12 @@ $p$-values come from?}
   \frametitle{Testing the Sharp Null of No Effects Practically}
   \framesubtitle{Ingredients: Hypothesis, Test Statistic Function, Distribution}
 
-<<>>=
+```{r }
 options(width=132)
 library(randomizr)
-@
+```
 
-<<sharpnulltest1,echo=TRUE,results='markup',highlight=TRUE,tidy=FALSE,tidy.opts=list(width.cutoff=130)>>=
+```{r sharpnulltest1,echo=TRUE,results='markup',highlight=TRUE,tidy=FALSE,tidy.opts=list(width.cutoff=130)}
 newexperiment <- function(block){
 	block_ra(blocks=block)
 }
@@ -208,7 +187,7 @@ testStat2 <- function(y,z,b){
     return(meandiffs)
   }
 }
-@
+```
 
 \end{frame}
 
@@ -220,7 +199,7 @@ testStat2 <- function(y,z,b){
   The probability distribution implied by the hypothesis is generated by
   repeating the experiment.
 
-<<sharpnulltest1ps,echo=TRUE,results='markup',highlight=TRUE,tidy=FALSE,tidy.opts=list(width.cutoff=130)>>=
+```{r sharpnulltest1ps,echo=TRUE,results='markup',highlight=TRUE,tidy=FALSE,tidy.opts=list(width.cutoff=130)}
 obsTestStat1 <- with(newsdf,testStat1(y=r,z=z,b=sF))
 obsTestStat2 <- with(newsdf,testStat2(y=r,z=z,b=sF))
 set.seed(12345)
@@ -233,7 +212,7 @@ p2SideMean<-2*min(mean(refDistNull1>=obsTestStat1),mean(refDistNull1<=obsTestSta
 p2SideRank <- 2*min(mean(refDistNull2>=obsTestStat2),mean(refDistNull2<=obsTestStat2))
 p2SideRank
 p2SideMean
-@
+```
 
 \end{frame}
 
@@ -254,10 +233,10 @@ p2SideMean
 \centering
 \includegraphics[width=.8\textwidth]{newspapersRandDist1.pdf}
 
-<<echo=TRUE>>=
+```{r echo=TRUE}
 6/16
 p1SideMean
-@
+```
 
 
 \end{frame}
@@ -271,42 +250,18 @@ p1SideMean
 	- Power differences. Sensitivity to different alternatives.
 
   \centering
-<<echo=FALSE, out.width=".6\\textwidth">>=
+```{r echo=FALSE, out.width=".6\\textwidth"}
 plot(density(refDistNull2),xlim=range(c(refDistNull1,refDistNull2)))
 rug(jitter(refDistNull2),line= -1,lwd=2)
 lines(density(refDistNull1),lty=2)
 rug(jitter(refDistNull1),line=.5,lwd=2)
 abline(v=obsTestStat2)
 abline(v=obsTestStat1)
-@
+```
 
 \end{frame}
 
-\end{frame}
-
-
-% \begin{frame}
-%   \frametitle{The Newspapers Study}
-%
-%
-% <<newsdesigntab2,results='asis',echo=FALSE>>=
-% print(newspapers.xtab,
-%       sanitize.text.function=function(x){x},include.rownames=FALSE,include.colnames=FALSE,
-%       table.placement="!ht",##size="small",
-%       add.to.row=list(pos=list(-1),
-% 		      command="&&& \\multicolumn{2}{c}{Turnout} \\\\ City &
-% 		      Pair & Treatment & \\multicolumn{1}{c}{Baseline} &
-% 		      \\multicolumn{1}{c}{Outcome} &
-% 		      \\multicolumn{1}{c}{Newspaper} &
-% 		      \\multicolumn{1}{c}{$y_{1}$} &
-% 		      \\multicolumn{1}{c}{$y_{0}$}\\\\"),
-%       hline.after=c(0,nrow(newspapers.xtab)))
-% @
-%
-% \end{frame}
-
-
-\section{Testing Sharp Hypotheses No Effects and No Interference}
+# Testing Sharp Hypotheses No Effects and No Interference
 
 \begin{frame}
   \frametitle{Statistical inference for counterfactual quantities with interference?}
@@ -331,7 +286,7 @@ abline(v=obsTestStat1)
 \end{frame}
 
 
-\section{Aspects of the approach: The tests do not require asymptopia.}
+# Aspects of the approach: The tests do not require asymptopia.
 
 \begin{frame}[containsverbatim,shrink]
 	\frametitle{Permutations vs Central Limit Theorem?}
@@ -339,11 +294,11 @@ abline(v=obsTestStat1)
 	Which distribution should we use? Which $p$-value is better? (On what
 	basis would we judge a $p$-value?)
 
-<<lmps,echo=TRUE,results='markup',highlight=TRUE,tidy=FALSE,tidy.opts=list(width.cutoff=130)>>=
+```{r lmps,echo=TRUE,results='markup',highlight=TRUE,tidy=FALSE,tidy.opts=list(width.cutoff=130)}
 lmpvalue <- summary(lm(r~z+sF,data=newsdf))$coef["z",4]
 lmpvalue
 p2SideMean
-@
+```
 
 (1) False positive rate
 
@@ -368,7 +323,7 @@ p2SideMean
 
 	\begin{columns}[t]
 		\begin{column}{.5\textwidth}
-<<largeN, echo=TRUE>>=
+```{r largeN, echo=TRUE}
 set.seed(20180225)
 N <- 1000
 y0 <- rchisq(N,df=1)
@@ -392,37 +347,37 @@ obsTestStat <- testStat3(y=Y,z=Z)
 randDist <- replicate(1000,testStat3(y=Y,z=newexpComplete(N)))
 mean(randDist >= obsTestStat)
 2* min( mean(randDist >= obsTestStat), mean(randDist <= obsTestStat))
-@
+```
 
-<<>>=
+```{r }
 library(sandwich)
 library(lmtest)
 
 thelm <- lm(Y~Z)
 theSEs <- coeftest(thelm,vcov=vcovHC(thelm,type="HC2"))
 theSEs[2,4]
-@
+```
 \end{column}
 \begin{column}{.5\textwidth}
 
 Notice heteroskedasticity.
 
-<<>>=
+```{r }
  boxplot(list(y0,y1))
-@
+```
 
 
-<<>>=
+```{r }
 plot(density(randDist))
 curve(dnorm(x,sd=theSEs[2,2],mean=0),from=-1,to=1,col="blue", add=TRUE)
-@
+```
 
 \end{column}
 \end{columns}
 
 \end{frame}
 
-\section{What is a $p$-value? What does a $p$-value require?}
+# What is a $p$-value? What does a $p$-value require?
 
 \begin{frame}
 	\frametitle{What does it mean to test a hypothesis?}
@@ -613,11 +568,11 @@ units could have been in treatment and control depending on the random process).
 \begin{frame}[containsverbatim] %,allowframebreaks]
   \frametitle{Testing the Sharp Null of No Effects Exactly}
 
-<<>>=
+```{r }
 options(width=132)
-@
+```
 
-<<sharpnulltest1exact,echo=TRUE,results='markup',highlight=TRUE,tidy=FALSE,tidy.opts=list(width.cutoff=130)>>=
+```{r sharpnulltest1exact,echo=TRUE,results='markup',highlight=TRUE,tidy=FALSE,tidy.opts=list(width.cutoff=130)}
 Z <- c(0,1,0,1) ## Define treatment vector
 Y <- c(16,22,7,14) ## Define outcome vector
 ## There are choose(4,2) ways to assign treatment
@@ -634,28 +589,28 @@ rankdifftz <- function(y,z){ q<-rank(y); mean(q[z==1]) - mean(q[z==0]) }
 mdist<-apply(Om,2, function(z){ meandifftz(Y,z) })
 rdist<-apply(Om,2, function(z){ rankdifftz(Y,z) })
 rbind(Om,mdist,rdist)
-@
+```
 
 \end{frame}
 
 \begin{frame}[containsverbatim]
 	\frametitle{continued}
 
-<<sharpnulltest2,echo=TRUE,results='markup',highlight=TRUE,tidy=FALSE,tidy.opts=list(width.cutoff=130)>>=
+```{r sharpnulltest2,echo=TRUE,results='markup',highlight=TRUE,tidy=FALSE,tidy.opts=list(width.cutoff=130)}
 table(mdist)
 table(rdist)
 mobs <- meandifftz(Y,Z) ## observed value of test stat
 robs <- rankdifftz(Y,Z) ## observed value of test stat
 mean(mdist >= mobs) ## p-value
 mean(rdist >= robs) ## p-value
-@
+```
 
 \end{frame}
 
 \begin{frame}[containsverbatim,shrink]
 	\frametitle{Faster Method}
 
-<<installdevritools, eval=FALSE,echo=FALSE>>=
+```{r installdevritools, eval=FALSE,echo=FALSE}
 ## Only run this once
 if(!dir.exists("libraries")){ dir.create("libraries") }
 .libPaths("libraries") ## make the default place for libraries the local one
@@ -665,10 +620,10 @@ if(!any(installedpackages[,"Package"]=="devtools")) {
   ## system("touch libraries/RItools/INSTALLED")
 }
 library(devtools)
-install_github("markmfredrickson/RItools@randomization-distribution")
-@
+install_github("markmfredrickson/RItools@randomization-distribution",force=TRUE,lib="libraries")
+```
 
-<<sharpnulltest3,echo=TRUE,results='markup',highlight=TRUE,tidy=FALSE,tidy.opts=list(width.cutoff=130)>>=
+```{r sharpnulltest3,echo=TRUE,results='markup',highlight=TRUE,tidy=FALSE,tidy.opts=list(width.cutoff=130)}
 library(RItools,lib.loc="libraries") ## see fishersinference.Rnw to get the dev version
 
 ## Specify design: only 1 block
@@ -680,5 +635,5 @@ meandiffTZ <- function(ys, z) {
 
 meandifftest<-RItest(y=Y, z=Z, test.stat=meandiffTZ, sampler = randomassignment)
 meandifftest
-@
+```
 

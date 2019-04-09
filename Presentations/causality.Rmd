@@ -62,7 +62,6 @@ options(digits=4,
 	)
 ```
 
-
 # What might `cause` **mean**?: Definitions and Conceptualization
 
 ## Some of my recent causal questions
