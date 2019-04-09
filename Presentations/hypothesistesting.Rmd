@@ -179,6 +179,29 @@ dat$Ybin <- as.numeric(dat$Y > 100)
 #pvalue(wilcox_test(Y~factor(Z),data=dat,distribution=exact(),alternative="less"))
 ```
 
+
+```{r echo=FALSE}
+## Make a bigger dataset
+##  y0 is potential outcome to control
+bigN <- 60
+set.seed(12345)
+bigdat <- data.frame(y0=c(rep(0,20),rnorm(20,mean=3,sd=.5),rnorm(20,mean=150,sd=10)))
+## Different individual level treatment effects
+bigdat$tau <- c(rnorm(20,mean=10,sd=2),rnorm(20,mean=20,sd=5),rnorm(20,mean=5,sd=10))
+## y1 is potential outcome to treatment
+bigdat$y1 <- bigdat$y0 + bigdat$tau
+#sd(y0)
+#mean(y1)-mean(y0)
+# mean(tau)
+## Z is treatment assignment
+set.seed(12345)
+bigdat$Z <- complete_ra(bigN)
+## Y is observed outcomes
+bigdat$Y <- with(bigdat, Z*y1 + (1-Z)*y0)
+## The data
+bigdat$Ybin <- as.numeric(bigdat$Y > quantile(bigdat$Y,.85))
+```
+
 ## A hypothesis is a statement about or model of a relationship between potential outcomes
 
 ```{r}
@@ -399,14 +422,14 @@ The proportion of small $p$-values should be no larger than $\alpha$.
 Example with a binary outcome.
 
 ```{r}
-collectPValues <- function(y,z){
+collectPValues <- function(y,z,thedistribution=exact()){
 	## Make Y and Z have no relationship by re-randomizing Z
 	newz <- repeatExperiment(length(y))
         thelm <- lm(y~newz,data=dat)
 	ttestP2 <- difference_in_means(y~newz,data=dat)
-	owP <- pvalue(oneway_test(y~factor(newz),distribution=exact()))
+	owP <- pvalue(oneway_test(y~factor(newz),distribution=thedistribution))
 	ranky <- rank(y)
-	owRankP <- pvalue(oneway_test(ranky~factor(newz),distribution=exact()))
+	owRankP <- pvalue(oneway_test(ranky~factor(newz),distribution=thedistribution))
 	return(c(lmp=summary(thelm)$coef["newz","Pr(>|t|)"],
 		 neyp=ttestP2$p.value[[1]],
 		 rtp=owP,
@@ -448,6 +471,48 @@ legend("topleft",legend=c("OLS","Neyman","Rand Inf Mean Diff","Rand Inf Mean Dif
 			  pch=1:5,col=1:5,lty=1,bty="n")
 
 
+```
+
+## False positive rate with $N=60$ and binary outcome
+
+```{r fprdsimBig, cache=TRUE}
+set.seed(12345)
+##pDistBig <- replicate(1000,collectPValues(y=bigdat$Ybin,z=bigdat$Z,thedistribution=approximate(B=1000)))
+library(parallel)
+pDistBigLst <- mclapply(1:1000,function(i){ collectPValues(y=bigdat$Ybin,z=bigdat$Z,thedistribution=approximate(nresample=1000))},mc.cores = 8)
+pDistBig <- simplify2array(pDistBigLst)
+```
+
+```{r plotecdfBig, results='asis', echo=FALSE, message=FALSE, warning=FALSE,out.width='.8\\textwidth'}
+par(mfrow=c(1,1),mgp=c(1.25,.5,0),oma=rep(0,4),mar=c(3,3,0,0))
+plot(c(0,1),c(0,1),type="n",
+     xlab="p-value=p",ylab="Proportion p-values < p")
+for(i in 1:nrow(pDistBig)){
+	lines(ecdf(pDistBig[i,]),pch=i,col=i)
+}
+abline(0,1,col="gray")
+legend("topleft",legend=c("OLS","Neyman","Rand Inf Mean Diff","Rand Inf Mean Diff Ranks"),
+			  pch=1:5,col=1:5,lty=1,bty="n")
+```
+
+## False positive rate with $N=60$ and continuous outcome
+
+```{r fprdsimBig2, cache=TRUE}
+set.seed(123456)
+pDistBigLst2 <- mclapply(1:1000,function(i) {collectPValues(y=bigdat$Y,z=bigdat$Z,thedistribution=approximate(nresample=1000))},mc.cores = 8)
+pDistBig2 <- simplify2array(pDistBigLst2)
+```
+
+```{r plotecdfBig2, results='asis', echo=FALSE, message=FALSE, warning=FALSE, out.width='.8\\textwidth'}
+par(mfrow=c(1,1),mgp=c(1.25,.5,0),oma=rep(0,4),mar=c(3,3,0,0))
+plot(c(0,1),c(0,1),type="n",
+     xlab="p-value=p",ylab="Proportion p-values < p")
+for(i in 1:nrow(pDistBig2)){
+	lines(ecdf(pDistBig2[i,]),pch=i,col=i)
+}
+abline(0,1,col="gray")
+legend("topleft",legend=c("OLS","Neyman","Rand Inf Mean Diff","Rand Inf Mean Diff Ranks"),
+			  pch=1:5,col=1:5,lty=1,bty="n")
 ```
 
 ## Topics for later
