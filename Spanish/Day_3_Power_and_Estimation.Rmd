@@ -1,0 +1,313 @@
+---
+title: "Herramientas clave para Diseños y Análisis de Investigación Experimental en R"
+author: "Ciudad de Guatemala, Guatemala - agosto, 2017"
+date: "Día 3: Análisis de Poder y Estimación de los Efectos del Tratamiento"
+output: html_document
+subtitle: Taller EGAP - Convivimos
+---
+
+#Hoy: Análisis de poder estadístico y estimación de los efectos
+
+* Análisis de poder estadístico
+    + Análisis simple de poder simple (N, tamaño del efecto, ruido)
+    + Análisis de poder para aleatorización por clústeres
+* Estimación de los efectos
+     + Simulación
+     + Asignar tratamiento 
+     + Estimar los efectos del tratamiento
+
+
+#1. Análisis de poder
+
+>Esta sección viene de estas dos páginas del sitio web de EGAP (¡muy útiles!): `http://egap.org/methods-guides/10-things-you-need-know-about-statistical-power` ("10 Cosas que debe saber sobre poder estadístico") and `http://egap.org/content/power-analysis-simulations-r` ("Análisis de poder y simulaciones en R"). 
+
+
+**¿Qué es poder?**
+
+Imaginemos que nuestro tratamiento realmente tiene un efecto y que fuéramos a correr el experimento una cantidad muy grande de veces. ¿Con qué frecuencia obtendríamos un resultado estadísticamente significativo?
+
+El responder esta pregunta, claramente, requiere un poco de "adivinar". Por ejemplo, tendremos que dar nuestra mejor suposición de qué tan grande puede ser razonablemente el verdadero efecto, cuántos sujetos respondieron nuestra encuesta, cuántos sujetos puede tratar nuestra organización de manera realista...
+
+¿De dónde vienen estas suposiciones? Antes de implementar un experimento, usualmente hay disponible una cantidad muy rica de información de línea de base.  Con el análisis de poder vamos a ver cuán sensibles es la probabilidad de obtener resultados significativos a cambios en nuestros supuestos.
+
+Muchas disciplinas han establecido un poder objetivo de 0.80. Los investigadores tratan de mover sus diseños y supuestos hasta lograr estar seguros que sus experimentos van a devolver resultados significativos el 80\% de las veces. Aunque esta convención es un benchmark útil, es importante ser conscientes de los riesgos asociados con una tasa de éxito del 80\%. 
+
+En resumidas cuentas...
+
+> El poder es la habilidad de un experimento de evitar cometer error Tipo II (no rechazar la hipótesis nula de no efecto cuando realmente existe un efecto)
+
+A continuación, vamos a ver un análisis de poder muy sencillo: 
+
+
+##1.a Un análisis de poder simple
+
+Los tres principales insumos para calcular el poder de un experimento son: 
+
+- N 
+- Ruido de la variable de resultado (i.e., su varianza)
+- Tamaño del efecto
+
+##Veamos con una simulación cómo cambia el poder modificando algunos de estos parámetros.
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+
+possible.ns <- seq(from=100, to=2000, by=50) # Los tamaños de la muestra que vamos a considerar
+powers <- rep(NA, length(possible.ns))       # Objeto vació para guardar las estimaciones de las simulaciones
+alpha <- 0.05                                # Nivel de significancia estándar
+sims <- 500                                  # Número de simulaciones para cada N
+
+#### Loop externo para variar el número de sujetos ####
+for (j in 1:length(possible.ns)){
+  N <- possible.ns[j]                        # Tomar el valor j para N
+  
+  significant.experiments <- rep(NA, sims)   # Objeto vació para contar el número de experimentos significativos
+  
+  #### Loop interno para conducir experimentos "sims" veces para cada valor de N ####
+  for (i in 1:sims){
+    Y0 <-  rnorm(n=N, mean=60, sd=20)              # Resultado potencial del control
+    tau <- 5                                       # Efecto del tratamiento asumido
+    Y1 <- Y0 + tau                                 # Resultado potencial del tratamiento
+    Z.sim <- rbinom(n=N, size=1, prob=.5)          # Hace asignación aleatoria
+    Y.sim <- Y1*Z.sim + Y0*(1-Z.sim)               # Resultados observados según asignación de tratemiento
+    fit.sim <- lm(Y.sim ~ Z.sim)                   # Análisis (regresión simple)
+    p.value <- summary(fit.sim)$coefficients[2,4]  # Extraer p-valores (asumimos igual varianza entre 
+                                                   # grupos de control y tratamiento)
+    significant.experiments[i] <- (p.value <= alpha) # Determinar significancia según p <= 0.05
+  }
+  
+  powers[j] <- mean(significant.experiments) # almacenar tasa promedio de éxito (poder) para cada N
+}
+
+```
+
+Veámos como se ve: 
+
+```{r,echo=FALSE}
+plot(possible.ns, powers, ylim=c(0,1), 
+     main= expression(paste("Cálculo de poder variando tamaño de muestra (", tau, " = 5, SD = 20)")),
+     xlab = "Tamaño muestra - N")
+abline(h=0.8, col="red")
+```
+
+###Miremos qué pasa para diferentes tamaños del efecto
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60),cache=TRUE,message=FALSE,warning=FALSE}
+
+possible.taus <- seq(from=0, to=20, by=0.25) 
+powers <- rep(NA, length(possible.taus))       
+for (j in 1:length(possible.taus)){
+ N <- 100   
+ tau <- possible.taus[j]                    
+ significant.experiments <- rep(NA, 500) 
+   for (i in 1:500){
+     Y0 <-  rnorm(n=N, mean=60, sd=20)                                                
+     Y1 <- Y0 + tau                                
+     Z.sim <- rbinom(n=N, size=1, prob=.5)         
+     Y.sim <- Y1*Z.sim + Y0*(1-Z.sim)               
+     fit.sim <- lm(Y.sim ~ Z.sim)                   
+     p.value <- summary(fit.sim)$coefficients[2,4]  
+     significant.experiments[i] <- (p.value <= 0.05)                                                  
+  }
+powers[j] <- mean(significant.experiments)
+}
+plot(possible.taus, powers, ylim=c(0,1), 
+     main= "Cálculo de poder variando tamaño del efecto (N=100, SD=20)",
+     xlab = expression(paste("Tamaño del efecto ", tau)))
+abline(h=0.8, col="red")
+
+```
+
+###Miremos qué pasa con diferente ruido
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60),cache=TRUE,message=FALSE,warning=FALSE}
+
+possible.sds <- seq(from=0, to=100, by=2) 
+powers <- rep(NA, length(possible.sds))       
+for (j in 1:length(possible.sds)){
+ N <- 200   
+ tau <- 5    
+ SDs <- possible.sds[j]
+ significant.experiments <- rep(NA, 500) 
+   for (i in 1:500){
+     Y0 <-  rnorm(n=N, mean=60, sd=SDs)                                                
+     Y1 <- Y0 + tau                                
+     Z.sim <- rbinom(n=N, size=1, prob=.5)         
+     Y.sim <- Y1*Z.sim + Y0*(1-Z.sim)               
+     fit.sim <- lm(Y.sim ~ Z.sim)                   
+     p.value <- summary(fit.sim)$coefficients[2,4]  
+     significant.experiments[i] <- (p.value <= 0.05)                                                  
+  }
+powers[j] <- mean(significant.experiments)
+}
+plot(possible.sds, powers, ylim=c(0,1), 
+     main= expression(paste("Cálculo de poder variando tamaño del ruido (N=200, ", tau, " = 5)")),
+     xlab = expression(paste("Desv. Est.", sigma)))
+abline(h=0.8, col="red")
+
+```
+
+##1.b Análisis de poder para una aleatorización por clústeres
+
+>**Nota:** Al correr el siguiente código (para aleatorización por clústeres) la primera vez, asegúrense de no pararlo mientras corre. Dado que la simulación toma bastante tiempo en correr, hemos añadido `cache=FALSE` a la sección de R para que, después de correr por primera vez, las siguientes veces que se compile el archivo, `R Markdown` use la información almacenada en el folder para que este proceso sea más rápido.
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60),message=FALSE,warning=FALSE, cache=TRUE}
+
+stopifnot(require(ggplot2))
+stopifnot(require(sandwich))
+
+# Función Auxuliar: calcula error estándar con un diseño de aleatorización por clústeres:
+
+vcovCluster <- function(model, cluster){
+  if(nrow(model.matrix(model))!=length(cluster)){
+    stop("check your data: cluster variable has different N than model")
+  }
+  M <- length(unique(cluster))  # Número de clústeres
+  N <- length(cluster)          # Tamaño muestra (clúster X n en clúster) 
+  K <- model$rank               # No. de parámetros estimados (del modelo MCO) 
+  if(M<50){
+    warning("Menos e clústeres, las varianzas pueden ser poco confiables (puede intentar bootstrap por bloques).")
+  }
+  dfc <- (M/(M - 1)) * ((N - 1)/(N - K))
+  uj  <- apply(estfun(model), 2, function(x) tapply(x, cluster, sum));
+  rcse.cov <- dfc * sandwich(model, meat = crossprod(uj)/N)
+  return(rcse.cov)
+}
+
+# Definir los parámetros para el análisis de poder  
+
+n_clusters <- seq(from = 20, to = 200, by = 20)    # Número de clústeres
+obs_per_cluster <- 2^(1:6)                         # Número de obs. por clúster
+grid <- expand.grid(n_clusters, obs_per_cluster)   # Todas las combinaciones de clústeres, número de obs/cluster
+powers <- rep(NA, nrow(grid))                      # Objeto vació para almacenar estimados de las simulaciones
+alpha <- 0.05                                      # Nivel de significancia estándar
+sims <- 400                                        # Número de simulaciones a conducir para cada N
+
+# Vamos a variar únicamente el N (n + número de clústeres):
+
+#### Loop externo para variar el número de sujetos ####
+for (j in 1:nrow(grid)){
+  
+  significant.experiments <- rep(NA, sims)   # Objeto vacío para almacenar número de experimentos significativos
+  
+  #### Loop interno para correr experimentos "sims" veces para cada N ####
+  for (i in 1:sims){
+  
+    clust_id <- rep(1:grid[j,1], 
+                    each = grid[j,2])                # Clúster ID var--para la función del error est.
+    clust_noise <- rep(rnorm(n = grid[j, 1], 
+                             mean = 20, sd = 10), 
+                       each = grid[j, 2])            # Ruido a nivel de clúster (el mismo para cada n 
+                                                     # dentro del mismo clúster)
+    Y0 <-  rnorm(n=prod(grid[j,]), 
+                 mean=30, sd=15) + clust_noise       # Resultado potencial del control
+    tau <- 5                                         # Efecto del tratamiento asumido
+    Y1 <- Y0 + tau                                   # Resultado potencial del tratamiento
+    Z.sim <- rep(sample(x = c(rep(0, grid[j,1]/2),
+                              rep(1, grid[j,1]/2)),
+                        size = grid[j,1], 
+                        replace = F), 
+                each = grid[j,2])                    # Hacer asignación de tratamiento a nivel clúster (AA completa)
+                                                     # Note individuos dentro de mismo clúster reciben mismo tratamiento
+    Y.sim <- Y1*Z.sim + Y0*(1-Z.sim)                 # Resultados observados según asignación tratamiento (i.e., y_obs)
+    fit.sim <- lm(Y.sim ~ Z.sim)                     # Análisis (regresión simple) --> usamos los coeffs.
+    se <- sqrt(vcovCluster(model = fit.sim, 
+                           cluster = clust_id)[2,2]) # Error est. de cluster (por qué no EE de reg?)
+    p.value <- pt(abs(fit.sim$coef[2]/se), 
+                  df = summary(fit.sim)$df[2], 
+                  lower.tail = F)                    # Calcular p-value de distribución T (estudiante)
+    significant.experiments[i] <- (p.value <= alpha) # Determinar significancia según 
+                                                     # p <= 0.05
+  }
+  
+  powers[j] <- mean(significant.experiments)         # almacenar tasa promedio de éxito (poder) para cada N
+}
+
+df <- data.frame(N_Clusters = grid[,1], Obs_per_Cluster = as.factor(grid[,2]), Power = powers)
+ggplot(data = df, aes(x = N_Clusters, y = Power, col = Obs_per_Cluster)) + 
+  geom_line() + theme_bw() + geom_hline(yintercept=0.8)
+
+```
+
+#2. Estimación de los efectos
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+
+# Borrar la memoria de R
+rm(list = ls())                        
+
+# Colocar semilla para poder replicar los resultados. Por ejemplo, usemos la fecha abril 20 de 2015.
+set.seed(20150420)                     
+
+# 2. Análisis usando datos simulados
+##############################################################################
+# Simulemos una base de datos de tamaño n
+
+# Número de personas en el estudio
+n  <- 10                          
+
+# El efecto promedio del tratamiento (estamos fijándolo en 1) 
+effect <- 1                       
+
+# Generar aleatoriamente los puntajes de los exámenes de la gente si no son tratados 
+Y0 <- rnorm(n)                     
+
+# Generar aleatoriamente los puntajes de los exámenes de la gente si son tratados 
+Y1 <- Y0 + effect + rnorm(n)       
+
+# Asiganción Aleatoria completa de la mitad de la gente a tratamiento
+X  <- sample(0:1, n, replace = TRUE) 
+
+# Usar tratamiento para "revelar" Y1 o Y0
+Y  <- Y0*(1-X) + Y1*X  
+
+# Miremos la base de datos (primero)
+data <- data.frame(Y0, Y1,  X, Y)
+#View(data)
+summary(data)
+
+# Podemos graficar los resultados potenciales de control y tratamiento para cada individuo
+par(mfrow=c(1,1))
+plot(1:n, Y1, xlab = "unit", ylab= "Resultados Potenciales")
+points(1:n, Y0, col = "red")
+arrows(1:n, Y0, 1:n, Y1, col = ifelse(Y0<Y1, "red", "black"))
+
+# ¡Estamos listos para la estimación!
+# Calcular el puntaje promedio observado para los controles
+av.cntrl <- mean(Y[X==0]) 
+av.cntrl
+
+# Calcular el puntaje promedio observado para los tratados
+av.treat <- mean(Y[X==1]) 
+av.treat
+
+# Calcular el efecto promedio del tratamiento
+est.effect <- av.treat-av.cntrl       
+est.effect
+
+# Calcular el efecto promedio del tratamiento usando regresión 
+summary(lm(Y ~ X))    
+
+# ¿Qué tan cerca estamos del verdadero efecto? (recuerden que lo habíamos fijado en 1)
+mean(Y1-Y0)
+
+# Ahora revisemos si el estimado es insesgado. Para hacer esto, debemos calcular cuál sería el estiamdo 
+# a través de todas las posibles aleatorizaciones (inferencia aleatorizada) 
+
+new.estimate = function(Y0, Y1, X){
+  # Entrar data para Y0, Y1 y X, la función vuelve a aleatorizar y genera un estimado
+  # del efecto promedio del tratamiento dada la nueva aleatorización
+  x.new <- sample(X)
+  y.new <- Y1*x.new + Y0*(1-x.new)
+  est   <-  mean(y.new[x.new==1]) -   mean(y.new[x.new==0])
+  return(est)
+}
+
+sims <- sapply(1:1000, function(i) new.estimate(Y0, Y1, X))
+hist(sims)
+
+# NOTAR que la estiamción depende mucho de la manera en que se llevó a cabo la aleatorización
+# Algunas veces va a estar muy por encima del efecto real, otras veces muy abajo, pero en promedio debería 
+# estar correcto.
+
+```
+

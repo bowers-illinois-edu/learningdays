@@ -1,0 +1,240 @@
+---
+title: "Herramientas clave para Diseños y Análisis de Investigación Experimental en R"
+author: "Ciudad de Guatemala, Guatemala - agosto, 2017"
+date: "Día 2: Estadísticas simples y aleatorización en R"
+output: html_document
+subtitle: Taller EGAP - Convivimos
+---
+
+#Hoy
+
+* **Estadísticas básicas**
+     + **Vectores**
+     + **Estadísticas clave**
+     + **Muestrear de distribuciones**
+     + **El teorema del límite central**
+* Aleatorización 
+     + Estrategias de aleatorización
+     + Ejercicio
+
+#1. Estadísticas básicas
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60),warning=FALSE, message=FALSE}
+
+# 1. Vectores
+# 2. Estadísticas clave
+# 3. Muestrear de distribuciones
+# 4. El teorema del límite central
+
+# instalar si es necesario: 
+# install.packages("Hmisc")
+library(Hmisc)
+
+# 1. Vectores
+##############################################################################
+# Comenzamos creando una secuencia de números. 
+# Acá hay una secuencia muy sencilla
+enteros <- c(1,2,3,4,5,6,7,8,9,10)
+enteros
+
+# Hay una manera más compacta de crear una secuencia como ésta:
+enteros <- 1:100
+enteros
+
+# o
+enteros <- seq(1,100, 1)
+enteros
+
+# 2. Estadísticas clave
+##############################################################################
+# listo, ya tenemos un conjunto de números. Podemos pensar estos números como un
+# "vector", una "variable", o una  "selección de una distribución"
+# Ahora, exploremos algunas características importantes de este vector.
+
+# El tamaño de este vector
+length(enteros)
+
+# Guardemos este número:
+n <- length(enteros)
+
+# La suma de los elementos de este vector
+sum(enteros)
+
+# La media de los elementos de este vector
+mean(enteros)
+
+# Para calcular la media manualmente:
+sum(enteros)/length(enteros)
+
+# La mediana
+median(enteros, na.rm=FALSE)
+
+# La varianza
+var(enteros)
+
+# Para calcular la varianza manualmente:
+mean((enteros-mean(enteros))^2)*(n/(n-1))
+
+# La desviación estándar
+sd(enteros)
+
+# EL cuadrado de la desviación estándar
+sd(enteros)^2
+
+# El número más grande
+max(enteros)
+
+# El número más pequeño
+min(enteros)
+
+# El percentil 15avo (es lo mismo para cualquier otro percentil)
+quantile(enteros, .15)
+
+# Todas estas estadísticas se pueden ver con un único comando:
+summary(enteros)
+
+describe(enteros)
+
+# Se puede graficar este vector de muchas formas
+# Un histograma
+hist(enteros)
+
+# un diagrama de caja y bigotes
+boxplot(enteros)
+
+# 3. Muestras aleatorias
+##############################################################################
+# Ahora, generemos muestras aleatorias de números y miremos sus propiedades
+# Empecemos con algo sencillo y digamos que tenemos un vector con sólo dos números, 0 y 1
+x <- 0:1
+
+# Podemos seleccionar un número de este vector así:
+sample(x,1)
+# y otra vez 
+sample(x,1)
+# y otra vez
+sample(x,1)
+
+# Si hiciéramos esto muchas muchas veces, construiríamos un nuevo vector
+# donde cada número en el vector es una lanzada de una moneda. Nuestro vector sería entonces un
+# sorteo de la distribución Bernoulli.
+
+# Hagamos 10 sorteos de (0,1) y coloquémosla en un vector llamado "sorteo"
+# Primero creamos un vector vacío para luego llenar: 
+sorteo<-NA
+# luego seleccionamos aleatoriamente 10 veces y cada vez ponemos el resultado en la posición i dentro del vector
+for(i in 1:10) sorteo[i]<- sample(x,1)
+# Miremos cómo se ve la variable
+sorteo
+# La nueva variable que hemos creado tiene media cerca a 0.5 y desviación estándar cerca a 0.5
+mean(sorteo)
+sd(sorteo)
+# El histograma de esta variable es como una gráfica de barras:
+hist(sorteo)
+# El número de 1's en nuestra selección es simplemente la suma de todos los elementos en el vector "sorteo"
+sum(sorteo)
+
+# TIP: arriba usamos un "loop" para crear la nueva variable, pero esto puede hacerse
+# mucho más compacto utilizando la función sapply
+# En este caso esto se haría en una línea en lugar de dos líneas así: 
+
+sapply(1:10, function(i) sample(x,1))
+
+# TIP 2: Cuando usamos "sample" también podemos acelerar las cosas pidiendo muchos sorteos al mismo tiempo, asumiendo que cada sorteo se hace "con reemplazo"
+sample(0:1, 10, replace = TRUE)
+
+# Ahora que hicimos toda esta operación 
+# 10 veces. Primero creamos un nuevo vector
+
+sorteo2<-NA
+# Después hacemos la operación previa 10 veces
+for(i in 1:10) sorteo2[i]<- {sum(sample(0:1, 10, replace = TRUE))}
+
+# O más compacto
+sorteo2<-sapply(1:10, function(i)  {sum(sample(0:1, 10, replace = TRUE))})
+# sorteo2 es una distribución "Binomial". Cada número en el vector es el número 
+# de caras de 10 lanzamientos de monedas. Veamos
+sorteo2
+# Ahora grafiquemos los resultados
+hist(sorteo2)
+# Usted debe ver algunos 5s y probablemente algunos 4s y 6s. 
+# Tal vez algunos otros números también. Compare los dos 
+# gráficos para darse una idea de la distribución, 
+# aunque debemos hacer esto más de 10 veces. Vamos a hacerlo 1000 veces.
+
+sorteo2<-sapply(1:1000, function(i)  {sum(sample(0:1, 10, replace = TRUE))})
+
+# Y grafiquemos los resultados
+hist(sorteo2)
+# Una vez más comparemos esto con el gráfico que teníamos antes, 
+# ¿qué se ve? Esto debería ser una buena distribución simétrica. Es una distribución "Binomial".
+
+# Existen funciones en R para generar muchos tipos de distribuciones. 
+# Por ej., puede obtener 10 números aleatorios de una distribución uniforme como ésta:
+runif(10)
+
+# O aún más general, para valores entre el 2 y 4 
+runif(10, min = 2, max = 4)
+
+# Si usted quisiera sortear de una distribución uniforme 
+# discreta usted podría hacerlo de esta manera
+floor(runif(10, 1, 11))
+# Donde "floor" significa que estamos redondeando al entero inferior 
+# El segundo valor es el extremo inferior del rango y el tercer valor es el extremo superior
+
+# Usted puede tomar 10 selecciones de una distribución normal estándar como esta:
+rnorm(10)
+# O en general, con media = 5 y sd = 3
+rnorm(10, mean = 5, sd = 3)
+
+# Podemos tomar muestras de una distribución binomial como ésta:
+rbinom(10, 5, .5)
+rbinom(10, 1000, .5)
+# Acá el primer número es el número de sorteos, el segundo número 
+# es el número de ensayos de Bernoulli en cada sorteo y el tercer número es 
+# la probabilidad subyacente
+
+# Entonces, en lugar de 
+# sapply(1:1000, function(i)  sum({sapply(1:10, function(j) sample(c(0:1),1))}))
+# hubiéramos podido haber hecho:
+# rbinom(1000, 10, .5)
+
+# También podemos obtener ensayos Bernoulli así 
+sample(0:1, 100, replace=TRUE)
+
+# o a sí 
+rbinom(100, 1, .5)
+
+# o así 
+(runif(100)<.5)*1
+
+# 4. Muestras de muestras y el Teorema del Límite Central
+##############################################################################
+
+# Consideremos de nuevo la gráfica de la distribución binomial que hemos generado
+
+hist(rbinom(1000, 10, .5))
+
+# Puede notar que esto se parece un poco a una distribución normal.
+# Hay una razón para eso:
+# La distribución de la media de las muestras aleatorias tiende a 
+# una distribución Normal a medida que el tamaño de las muestras aumenta. 
+# Este es el Teorema del Límite Central.
+# La distribución binomial es la distribución de las sumas (en lugar de las medias) 
+# de los sorteos de una distribución de Bernoulli. Así que se comporta de la misma manera.
+# Un pequeño cambio en nuestro código ilustra el Teorema del Límite Central muy bien:
+
+# Hicimos algunos pocos cambios. ¿Cuáles y por qué?
+hist(rbinom(100000, 10000, .5)/10000, breaks = 50)
+
+# Es asombroso que uno pueda generar una distribución normal 
+# como esta usando solamente un conjunto de lanzamientos de una moneda. 
+# Para hacer esto más explícito creemos una gran matriz de 0s y 1s
+
+flips = matrix(sample(0:1, 10000000, replace=TRUE), 10000,1000)
+
+# y grafiquemos los promedios de cada fila
+hist(apply(flips, 1, mean), breaks = 50)
+
+```
+

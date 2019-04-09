@@ -1,0 +1,374 @@
+---
+title: "Herramientas clave para Diseños y Análisis de Investigación Experimental en R"
+author: "Ciudad de Guatemala, Guatemala - agosto, 2017"
+date: "Día 1: Inducción a R"
+output: html_document
+subtitle: Taller EGAP - Convivimos
+---
+
+#Hoy: 
+
+* Comenzando a usar R
+     + ¿Qué es R, cómo funciona?
+     + Comandos clave
+* Estadística descriptiva y gráficos 
+     + Manos a la obra: Trabajo con datos propios
+
+#1. Comenzando a usar R
+
+##1.a. ¿Qué es R, cómo funciona?
+
+R es una herramienta de programación abierta (es decir, de acceso gratis). Funciona a partir de objetos: Esto significa que todo en R es un objeto... incluso los comandos son objetos. Por ejemplo:
+
+```{r,tidy=TRUE}
+mean
+```
+
+En R, también pueden guardar objetos usando el operador `<-`. Asegúrense de asignarle nombres a todos los objetos:
+
+```{r}
+mi.ejemplo <- 4 + 5
+mi.ejemplo
+```
+
+> "Los nombres deben ser únicos": cada vez que le asignan un `nombre` a un `objeto`, éste remueve del ambiente de R cualquier cosa que ya tuviera ese `nombre`!
+
+```{r}
+mi.nombre <- dir()
+mi.nombre
+```
+
+Cuando no estén seguros de cómo funciona un comando, pueden abrir su documentación usando: `?`
+
+```{r}
+?mean
+```
+
+¡Esta herramienta es muy muy útil! Familiarícense con ésta y siéntanse cómodo usándola... 
+
+##1.b. Comandos clave: 
+
+En esta sección corta vamos a repasar los principales comandos que probablemente usarán en estas sesiones de trabajo. NOTA: (*) corresponde a comandos más sofisticados (pero muy útiles). 
+
+###DEJANDO LISTA SU SESIÓN EN R
+
++ Primero, pregunten a R cuál es el directorio de trabajo en el que se encuentran trabajando. Luego, coloquen su directorio local: noten la dirección de los signos ( / no \\ ). 
+
+```{r}
+getwd()
+setwd("/Users/nataliagarbirasdiaz/Dropbox/Njala University Workshop on Experiments/Workshop 2016 (Chile)/R_handouts/Day_1_Getting_Started_R")   
+```
+
++ Instalen cualquier paquete relevante (sólo deben hacer esto una vez). 
+
+```{r,eval=FALSE}
+install.packages("Hmisc")  
+```
+
++ *Carguen* cualquier paquete relevante.
+
+```{r,message=FALSE,warning=FALSE}
+library(Hmisc)
+```
+
++ Limpiar la memoria de R     
+
+```{r}
+rm(list = ls())                                   
+set.seed(20150420)        # OPT: Coloquen una "semilla" para poder replicar los resultados 
+```
+
+###ELEMENTOS BÁSICOS EN R 
+
+¡Bien!, ya están listos para empezar a trabajar en R. Ahora exploremos más comandos básicos que van a estar usando en estos días.
+
++ Crear y manipular variables y vectores:
+
+```{r}
+a <- 5                 # "<-"  es el comando de asignación; se usa para definir cosas. Por ej.:
+a
+
+b <- 1:10              # ":"  se usa para definir un string de enteros
+b
+
+v <- c(1,3,2,4,110,pi) # usar c() para crear un vector con cualquier cosa adentro
+v
+
+# Extraer elementos de un vector:
+
+b[1]                   # Devuelve la posición 1
+b[6:5]                 # Devuelve las posiciones 6 y 5, en ese orden
+b[-1]                  # Devuelve todos los números excepto el primero
+
+# Devuelve todos los números marcados como "TRUE" (verdadero)
+b[c(TRUE, FALSE, TRUE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE)]  
+                                                                          
+# Asigna nuevos valores a elementos particulares de un vector
+b[5] <- 0
+b
+```
+
++ Manipular Matrices:
+
+```{r}
+matrix(1:12, 3, 4)             # Crear una matriz de 3*4 con los números 1:12
+matrix(1:12, 4, 3)             # Crear una matriz de 4*2 con los números 1:12
+matrix(1:3, 4, 3)              # Crear una matriz de 4*3 con los números 1:3, en ciclo; llenando por columnas
+matrix(1:3, 4, 3, byrow=TRUE)  # Crear una matriz de 4*3 con los números 1:3, en ciclo, llenando por filas
+```
+
++ Añadir nombres a las filas y las columnas de una matriz
+
+```{r}
+M<-matrix(1:12, 3, 4)
+rownames(M) = c("a","b","c")
+colnames(M) = c("A","B","C", "Z")
+M
+```
+
++ Funciones simples con vectores (vamos a retomar estas funciones)
+
+```{r}
+sum(b)                     # sumar
+mean(b)                    # media
+max(b)                     # mediana
+min(b)                     # mínimo
+sd(b)                      # desviación estándar 
+var(b)                     # varianza
+```
+
++ Transformaciones sencillas con vectores (o números, o matrices)
+
+```{r}
+b^2                        # La variable al cuadrado
+matrix(1:3, 4, 3)^2        # Elevar al cuadrado los elementos de la matriz
+b^.5                       # Raíz cuadrada de la variable
+log(b)                     # Logaritmo de la variable
+exp(b)                     # e a la b
+```
+
++ Comandos lógicos (pide que se evalúen condiciones)
+
+```{r}
+b==2                       # Es igual a
+b<5                        # Es menor a
+b>=5                       # Es mayor o igual a 
+b<=5 | b/4==2              # O
+b>2 & b<9                  # Y
+is.na(b)                   # Donde el dato esté faltando 
+which(b<5)                 # Devuelve los índices de los valores que cumplen la condición lógica
+```
+
++ Distribuciones 
+
+```{r}
+rnorm(5)                      # Selecciona 5 obs. de la distribución normal
+rbinom(5, 10, .4)             # Selecciona 5 obs. de la distribución binomial
+runif(5)                      # Selecciona 5 obs. de la distribución uniforme
+```
+
++ Funciones con PAREJAS de variables
+
+```{r}
+x  = rnorm(100)               # Crear variable "x" con 100 obs. de la distribución normal 
+y  = x+rnorm(100)
+
+y+x                            # Suma de variables (o resto, multiplicación etc.)
+y>x                            # Relación lógica entre dos variables
+cor(x,y)                       # Correlación entre variables
+t.test(y~(x>.5))               # t-test con hipótesis nula de no relación entre las variables
+lm(y~x)                        # Regresión por MCO
+M<- lm(y~x)   
+summary(M)                     # Resumen de la regresión por MCO
+y%*%x                          # Producto interno de variables
+
+# Hacer una base de datos y verla
+d <- data.frame(x, y)
+```
+
++ Loops (\*): Los loops repiten una operación o función sobre los diferentes valores de *i*. Ver el siguiente ejemplo:   
+
+```{r}
+x<-0                    
+for(i in 1:10){         # repetir una expresión para los valores de i del 1 al 10. 
+  print(x<x+i)          # print les permite ver los resultados en la consola de R.  
+   }
+
+x=0
+while(x <10){           # Repetir la expresión siempre y cuando la condición se satisfaga.
+  print(x^2)
+  x<-x+1
+}
+
+```
+
++ Apply y sapply (*): Estos dos comandos son muy útiles para programar eficientemente. Éstos aplican una función sobre una matriz o vector. NOTA: Recuerden que ustedes pueden explorar cómo funcionan estos comandos usando `?apply` o `?sapply`.  
+
+```{r}
+sapply(1:4, function(j) j^2)   # Forma más fácil de hacer loops; este ejemplo corre la función j^2 en 
+                               # los números j del 1:4
+M<-matrix(rnorm(40), 4, 10)
+apply(M, 1, mean)              # Forma más fácil de hacer muchas operaciones en una matriz: acá sacar la media 
+                               # de cada FILA (1)
+apply(M, 2, sd)                # Forma más fácil de hacer muchas operaciones en una matriz: acá sacar la media 
+                               # de cada COLUMNA (2)
+```
+
+#### Ahora escribamos su propia función: 
+
+```{r}
+h <- function(a, b=1) {        # Para definir una función: 1. asignar los argumentos (acá a,b).
+                               # 2. Asignar cualquier valor pre-establecido
+     a^2 -b                    # (acá b=1), y luego escribir la función
+          }             
+h(1)                           # Ilustración de la función  
+h(1,2)                         # Ilustración de la función 
+
+```
+
+#### Paréntesis
+
+```{r}
+# ( )   se usan para funciones y vectores: 
+log(1)
+
+# ( )   también se usan para agrupar cosas en bloques:
+(1+2)/(2+1)
+1+2/2+1
+
+# [ ]   se usan para extraer índices:
+(10:12)[2]
+
+# { } se usan para mantener bloques juntos, devolviendo el componente final:
+x <- {
+  a<-1
+  b<-2
+  a/b
+}
+
+x
+```
+
+#2. Estadística descriptiva y gráficos
+
+Vamos a crear dos variables que están distribuidas normal y luego vamos a usar distintas herramientas para caracterizar estos datos.
+
+```{r}
+# Primero, ¿cómo hacemos esto?
+y <- rnorm(10)                  # Generar y de la distribución normal 
+x <- rnorm(10)                  # Generar x de la distribución normal
+```
+
+Ahora, miremos algunas estadísticas descriptivas básicas
+
+```{r}
+mean(y)
+mean(x)                 
+var(x)
+sd(x)
+max(x)
+min(x)
+summary(x)          # Estadísticas de resumen básicas
+
+cov(x,y)            # ¿Qué es cov? 
+mean(y[x>0])        # Estima la media de y cuando x>0
+
+```
+
+Ahora grafiquemos ambas variables:
+
+```{r,warning=FALSE,message=FALSE}
+
+par(mfrow = c(1,2))             # Esto les permite poner un grupo de gráficas en el mismo "lienzo" -- acá, 1 por 2
+hist(y)                         # Un histograma
+boxplot(y~(x>0))                # Box plot
+dev.off()                       # Acá le decimos a R que ya no queremos las gráficas en un lienzo 1 por 2. 
+```
+
+```{r}
+plot(x,y)                       # gráficas de xy  
+abline(a=-1, b = 1, col="blue") # Añadir una línea con pendiente
+abline(v=mean(x), col="red")    # Añadir línea vertical
+abline(lm(y~x))                 # Añadir línea de regresión
+text(0, 0.2, "algun texto")       # Añadir texto
+title("Ejercicio")            # Añadir un título
+
+# Una gráfica más "sofisticada"
+x1 <- rnorm(100)
+x2 <- rnorm(100) 
+x3 <- rnorm(100)+x1+x2
+
+plot(density(x1))           # Acá graficamos la distribución de x1.
+
+#¿Cómo podemos graficas las tres distribuciones?
+
+plot(density(x1), main="Ejercicio")   #Noten que podemos agregar un título usando el mismo comando para graficar (plot)
+lines(density(x2), col="slateblue")
+lines(density(x3), lwd = 2)
+lines(density(x1+x2), lty=2)
+
+##Añadir leyenda
+legend("topright", legend = c("x1","x2","x3","x1+x2"), 
+       col = c("black", "slateblue", "black","black"),
+       lty = c(1, 1, 1, 2), bg = "gray90")
+
+```
+
+##2.a. Para practicar con sus datos
+
+El siguiente código les va a ayudar importar datos en formato `.csv` o `.dta` (Stata):
+
+```{r, eval=FALSE}
+
+#install.packages("foreign")        # Este paquete les permite importar datos en otros formatos
+                                    # Descomentar si no lo han está instalado todavía 
+library(foreign)
+
+#install.packages("readstata13")    # Este paquete les permite importar datos en Stata 13 y 14
+                                    # Descomentar si no lo han está instalado todavía
+library(readstata13)
+
+#Archivos en Stata: 
+dta<- read.dta("directorio /nombre_archivo.dta")     # Insertar el directorio correcto
+dta13<- read.dta13("directorio/nombre_archivo.dta") # En caso que estén importando de Stata 13
+
+# Acrhivos CSV: 
+dta.csv <-dta.csv("file_path/file_name.dta") # Insertar el directorio correcto 
+
+# Archivos en SPSS
+?read.spss
+
+```
+
+Ahora, llenen estos campos con sus datos: 
+
+---------------------------------------------------------------------------------------------------
+Variable                            Grupo Tratamiento       Grupo Control        Toda la Muestra
+--------------------------------- --------------------- --------------------- ---------------------
+                                   Mean  SD  Min   Max   Mean  SD  Min   Max   Mean  SD  Min   Max
+**Co-variables**                   
+
+Variable de resultado pre-trat.   
+(si está disponible)                   
+
+Covar. 1                      
+
+Covar. 2                      
+
+**Variables de resultado**            
+
+Var de resultado 1               
+
+Var de resultado 2               
+---------------------------------------------------------------------------------------------------
+
+
+Finalmente, usen sus propios datos para crear los siguientes gráficos: 
+
++ Distribución de cada una de sus principales variables de resultado de interés 
++ Graficar el promedio para cada una de sus variables de resultado para cada grupo experimental
+
+
+
+
+
